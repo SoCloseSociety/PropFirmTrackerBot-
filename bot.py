@@ -23,7 +23,8 @@ from config import (
     TELEGRAM_BOT_TOKEN, ADMIN_USER_IDS, PROP_FIRMS,
     PREMIUM_PRICE_MONTHLY, PREMIUM_PRICE_YEARLY,
     REFERRALS_NEEDED, REFERRAL_REWARD_DAYS,
-    CRYPTO_WALLET_USDT_TRC20, STRIPE_API_KEY
+    CRYPTO_WALLET_USDT_TRC20, STRIPE_API_KEY,
+    PREMIUM_CHANNEL_ID
 )
 
 
@@ -31,12 +32,17 @@ from config import (
 # HELPER FUNCTIONS
 # ══════════════════════════════════════════════════════════════
 
+def is_admin(user_id):
+    """Check if user is admin."""
+    return int(user_id) in ADMIN_USER_IDS
+
+
 def premium_required(func):
     """Decorator to restrict commands to premium users."""
     @functools.wraps(func)
     async def wrapper(update: Update, context: ContextTypes.DEFAULT_TYPE):
         user_id = update.effective_user.id
-        if not is_premium(user_id):
+        if not is_premium(user_id) and not is_admin(user_id):
             keyboard = [[InlineKeyboardButton("💎 Upgrade to Premium", callback_data="premium_info")]]
             await update.message.reply_text(
                 "🔒 <b>Premium Feature</b>\n\n"
@@ -51,6 +57,18 @@ def premium_required(func):
                 parse_mode='HTML',
                 reply_markup=InlineKeyboardMarkup(keyboard)
             )
+            return
+        return await func(update, context)
+    return wrapper
+
+
+def admin_required(func):
+    """Decorator for admin-only commands with feedback."""
+    @functools.wraps(func)
+    async def wrapper(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        user_id = update.effective_user.id
+        if not is_admin(user_id):
+            await update.message.reply_text("⛔ Admin only.")
             return
         return await func(update, context)
     return wrapper
@@ -170,6 +188,19 @@ async def cmd_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "/help — This message\n"
         "/support — Contact support\n"
     )
+
+    # Show admin commands to admins
+    if is_admin(update.effective_user.id):
+        msg += (
+            "\n<b>🔐 Admin Commands:</b>\n"
+            "/admin — Admin dashboard\n"
+            "/stats — Bot statistics\n"
+            "/scrape — Force manual scrape\n"
+            "/activate [user_id] [days] — Give premium\n"
+            "/addvip [user_id] [days] — Premium + channel invite\n"
+            "/broadcast [message] — Send to all users\n"
+        )
+
     await update.message.reply_text(msg, parse_mode='HTML')
 
 
@@ -259,7 +290,6 @@ async def cmd_scores(update: Update, context: ContextTypes.DEFAULT_TYPE):
         score = data.get('score', 0)
         reviews = data.get('review_count', 0)
 
-        # Score emoji
         if score >= 4.5:
             emoji = "🟢"
         elif score >= 3.5:
@@ -309,14 +339,13 @@ async def cmd_compare(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     msg = f"🔍 <b>{firm1['name']} vs {firm2['name']}</b>\n\n"
 
-    # Trustpilot comparison
     score1 = f"{s1.get('score', 'N/A')}/5" if s1.get('score') else "N/A"
     score2 = f"{s2.get('score', 'N/A')}/5" if s2.get('score') else "N/A"
     msg += f"⭐ Trustpilot: <b>{score1}</b> vs <b>{score2}</b>\n"
     msg += f"🏢 Commission: {firm1.get('affiliate_commission', '?')} vs {firm2.get('affiliate_commission', '?')}\n"
 
-    msg += f"\n🔗 <a href='{firm1.get('affiliate_url', firm1['url'])}'>{firm1['name']}</a>"
-    msg += f" | <a href='{firm2.get('affiliate_url', firm2['url'])}'>{firm2['name']}</a>\n"
+    msg += f"\n🔗 <a href='{firm1.get('affiliate_url', firm1.get('url', '#'))}'>{firm1['name']}</a>"
+    msg += f" | <a href='{firm2.get('affiliate_url', firm2.get('url', '#'))}'>{firm2['name']}</a>\n"
 
     if is_premium(update.effective_user.id):
         msg += "\n🧠 Use /analysis [firm] for AI-powered deep analysis"
@@ -415,7 +444,6 @@ async def cmd_referral(update: Update, context: ContextTypes.DEFAULT_TYPE):
     bot_name = get_bot_name(context)
     ref_link = f"https://t.me/{bot_name}?start=REF_{ref_code}"
 
-    # Progress bar
     filled = min(unrewarded, REFERRALS_NEEDED)
     progress = "🟢" * filled + "⚪" * (REFERRALS_NEEDED - filled)
 
@@ -501,24 +529,18 @@ async def cmd_premium(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     keyboard = []
 
-    # Stripe payment (if configured)
     if STRIPE_API_KEY:
         keyboard.append([
             InlineKeyboardButton("💳 Pay with Card — Monthly", callback_data="pay_stripe_monthly"),
             InlineKeyboardButton("💳 Pay with Card — Yearly", callback_data="pay_stripe_yearly"),
         ])
 
-    # Crypto payment
     keyboard.append([
         InlineKeyboardButton("₿ Pay with Crypto (USDT)", callback_data="pay_crypto"),
     ])
-
-    # Telegram Stars (native)
     keyboard.append([
         InlineKeyboardButton("⭐ Pay with Telegram Stars", callback_data="pay_stars"),
     ])
-
-    # Free option
     keyboard.append([
         InlineKeyboardButton("🆓 Earn Free Premium (Referral)", callback_data="referral_info"),
     ])
@@ -535,7 +557,18 @@ async def cmd_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     db_user = get_or_create_user(user_id, update.effective_user.username, update.effective_user.first_name)
 
-    status = "💎 Premium" if is_premium(user_id) else "🆓 Free"
+    premium = is_premium(user_id)
+    admin = is_admin(user_id)
+
+    if admin and premium:
+        status = "👑 Admin + Premium"
+    elif admin:
+        status = "👑 Admin"
+    elif premium:
+        status = "💎 Premium"
+    else:
+        status = "🆓 Free"
+
     expires = db_user.get('premium_expires_at', 'N/A')
     if expires and expires != 'N/A':
         expires = expires[:10]
@@ -551,6 +584,14 @@ async def cmd_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"🔑 Referral code: <code>{ref_code}</code>\n"
         f"📅 Joined: {db_user.get('joined_at', 'N/A')[:10]}\n"
     )
+
+    if admin:
+        msg += (
+            f"\n🔐 <b>Admin Panel</b>\n"
+            f"  ADMIN_USER_IDS: {ADMIN_USER_IDS}\n"
+            f"  PREMIUM_CHANNEL: {PREMIUM_CHANNEL_ID or 'Not set'}\n"
+            f"  Type /admin for admin commands\n"
+        )
 
     await update.message.reply_text(msg, parse_mode='HTML')
 
@@ -644,11 +685,38 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # ADMIN COMMANDS
 # ══════════════════════════════════════════════════════════════
 
+@admin_required
+async def cmd_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Admin: Show admin dashboard with all commands."""
+    stats = get_user_stats()
+    from database import get_connection
+    conn = get_connection()
+    total_changes = conn.execute("SELECT COUNT(*) as c FROM changes").fetchone()['c']
+    total_promos = conn.execute("SELECT COUNT(*) as c FROM promos WHERE is_active = 1").fetchone()['c']
+    conn.close()
+
+    msg = (
+        f"👑 <b>Admin Dashboard</b>\n\n"
+        f"👥 Users: {stats['total']} (💎 {stats['premium']} premium)\n"
+        f"📈 Changes: {total_changes} | Promos: {total_promos}\n\n"
+        f"<b>🔐 Admin Commands:</b>\n\n"
+        f"/stats — Full statistics\n"
+        f"/scrape — Force manual scrape now\n"
+        f"/activate <code>[user_id] [days]</code> — Give premium\n"
+        f"/addvip <code>[user_id] [days]</code> — Premium + invite link\n"
+        f"/broadcast <code>[message]</code> — Send to all users\n\n"
+        f"<b>💡 Examples:</b>\n"
+        f"<code>/activate 123456789 30</code>\n"
+        f"<code>/addvip 123456789 90</code>\n"
+        f"<code>/broadcast 🎉 New feature! Check /promos</code>\n"
+    )
+
+    await update.message.reply_text(msg, parse_mode='HTML')
+
+
+@admin_required
 async def cmd_admin_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Admin: Show bot statistics."""
-    if update.effective_user.id not in ADMIN_USER_IDS:
-        return
-
     stats = get_user_stats()
     from database import get_connection
     conn = get_connection()
@@ -674,30 +742,129 @@ async def cmd_admin_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(msg, parse_mode='HTML')
 
 
+@admin_required
 async def cmd_admin_activate(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Admin: Manually activate premium for a user."""
-    if update.effective_user.id not in ADMIN_USER_IDS:
-        return
-
     if len(context.args) < 1:
-        await update.message.reply_text("Usage: /activate [user_id] [days=30]")
+        await update.message.reply_text(
+            "Usage: /activate <code>[user_id]</code> <code>[days=30]</code>\n\n"
+            "Example: <code>/activate 123456789 30</code>",
+            parse_mode='HTML'
+        )
         return
 
-    target_id = int(context.args[0])
+    try:
+        target_id = int(context.args[0])
+    except ValueError:
+        await update.message.reply_text("❌ Invalid user ID. Must be a number.")
+        return
+
     days = int(context.args[1]) if len(context.args) > 1 else 30
 
+    # Make sure user exists in DB
+    get_or_create_user(target_id)
+
     activate_premium(target_id, days=days, reason="admin_manual")
-    await update.message.reply_text(f"✅ Premium activated for {target_id} — {days} days")
+    await update.message.reply_text(
+        f"✅ <b>Premium activated!</b>\n\n"
+        f"👤 User: <code>{target_id}</code>\n"
+        f"📅 Duration: {days} days\n"
+        f"💎 Status: Premium active",
+        parse_mode='HTML'
+    )
     log_info(f"Admin activated premium: user {target_id} for {days} days", tag="PAY")
 
 
-async def cmd_admin_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Admin: Broadcast a message to all users."""
-    if update.effective_user.id not in ADMIN_USER_IDS:
+@admin_required
+async def cmd_admin_addvip(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Admin: Activate premium AND send invite link to premium channel."""
+    if len(context.args) < 1:
+        await update.message.reply_text(
+            "🎟️ <b>Add VIP Member</b>\n\n"
+            "Usage: /addvip <code>[user_id]</code> <code>[days=30]</code>\n\n"
+            "This will:\n"
+            "1. Activate premium for the user\n"
+            "2. Send them an invite link to the VIP channel\n\n"
+            "Example: <code>/addvip 123456789 90</code>",
+            parse_mode='HTML'
+        )
         return
 
+    try:
+        target_id = int(context.args[0])
+    except ValueError:
+        await update.message.reply_text("❌ Invalid user ID. Must be a number.")
+        return
+
+    days = int(context.args[1]) if len(context.args) > 1 else 30
+
+    # Ensure user exists
+    get_or_create_user(target_id)
+
+    # 1. Activate premium
+    activate_premium(target_id, days=days, reason="admin_vip_gift")
+
+    # 2. Try to create invite link and send to user
+    invite_link = None
+    if PREMIUM_CHANNEL_ID:
+        try:
+            link_obj = await context.bot.create_chat_invite_link(
+                chat_id=PREMIUM_CHANNEL_ID,
+                member_limit=1,
+                name=f"VIP-{target_id}"
+            )
+            invite_link = link_obj.invite_link
+        except Exception as e:
+            log_error(f"Failed to create invite link: {e}", tag="ADMIN")
+
+    # 3. Notify the user
+    try:
+        msg = (
+            f"🎉 <b>Congratulations!</b>\n\n"
+            f"You've been granted <b>{days} days of Premium</b> access! 💎\n\n"
+            f"You now get:\n"
+            f"⚡ Real-time alerts (no delay)\n"
+            f"🧠 AI-powered analysis\n"
+            f"🚨 Instant scam warnings\n"
+            f"📜 Full change history\n"
+        )
+        if invite_link:
+            msg += f"\n🔗 <b>Join the VIP Channel:</b>\n{invite_link}\n"
+        msg += f"\nEnjoy! 🚀"
+
+        await context.bot.send_message(
+            chat_id=target_id,
+            text=msg,
+            parse_mode='HTML'
+        )
+        user_notified = True
+    except Exception as e:
+        user_notified = False
+        log_error(f"Failed to notify user {target_id}: {e}", tag="ADMIN")
+
+    # 4. Confirm to admin
+    result_msg = (
+        f"✅ <b>VIP Added!</b>\n\n"
+        f"👤 User: <code>{target_id}</code>\n"
+        f"📅 Duration: {days} days\n"
+        f"💎 Premium: ✅\n"
+        f"🔗 Invite link: {'✅ Sent' if invite_link else '❌ Could not create (check channel ID)'}\n"
+        f"📨 User notified: {'✅' if user_notified else '❌ (user may not have started bot)'}"
+    )
+
+    await update.message.reply_text(result_msg, parse_mode='HTML')
+    log_info(f"Admin added VIP: user {target_id} for {days} days", tag="PAY")
+
+
+@admin_required
+async def cmd_admin_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Admin: Broadcast a message to all users."""
     if not context.args:
-        await update.message.reply_text("Usage: /broadcast [message]")
+        await update.message.reply_text(
+            "Usage: /broadcast <code>[message]</code>\n\n"
+            "Supports HTML formatting.",
+            parse_mode='HTML'
+        )
         return
 
     message = " ".join(context.args)
@@ -705,6 +872,8 @@ async def cmd_admin_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE
     conn = get_connection()
     users = conn.execute("SELECT user_id FROM users WHERE is_banned = 0").fetchall()
     conn.close()
+
+    await update.message.reply_text(f"📢 Broadcasting to {len(users)} users...")
 
     sent = 0
     failed = 0
@@ -716,48 +885,45 @@ async def cmd_admin_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE
                 parse_mode='HTML'
             )
             sent += 1
-            await asyncio.sleep(0.05)  # Rate limit
+            await asyncio.sleep(0.05)
         except Exception:
             failed += 1
 
-    await update.message.reply_text(f"📢 Broadcast sent: {sent} delivered, {failed} failed")
+    await update.message.reply_text(f"📢 Broadcast done: ✅ {sent} delivered, ❌ {failed} failed")
 
 
+@admin_required
 async def cmd_admin_scrape(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Admin: Trigger manual scrape."""
-    if update.effective_user.id not in ADMIN_USER_IDS:
-        return
-
-    await update.message.reply_text("🔍 Starting manual scrape...")
+    await update.message.reply_text("🔍 Starting manual scrape... I'll report when done.")
     log_info("Admin triggered manual scrape", tag="SCRAPE")
 
-    # Run scrape in background
     from scrapers import PropFirmScraper, RedditScraper, TrustpilotScraper
 
     results = []
     try:
         pf = PropFirmScraper()
         r = pf.scrape_all()
-        results.append(f"Firms: {r['scraped']} pages, {r['changes']} changes, {r['promos']} promos")
+        results.append(f"✅ Firms: {r['scraped']} pages, {r['changes']} changes, {r['promos']} promos, {r['errors']} errors")
     except Exception as e:
-        results.append(f"Firms: Error — {e}")
+        results.append(f"❌ Firms: {e}")
 
     try:
         rs = RedditScraper()
         r = rs.scrape_all()
-        results.append(f"Reddit: {r['posts_found']} posts, {r['mentions']} mentions")
+        results.append(f"{'✅' if r['errors'] == 0 else '⚠️'} Reddit: {r['posts_found']} posts, {r['mentions']} mentions, {r['errors']} errors")
     except Exception as e:
-        results.append(f"Reddit: Error — {e}")
+        results.append(f"❌ Reddit: {e}")
 
     try:
         ts = TrustpilotScraper()
         r = ts.scrape_all()
-        results.append(f"Trustpilot: {r['scraped']} scores")
+        results.append(f"{'✅' if r['errors'] < 5 else '⚠️'} Trustpilot: {r['scraped']} scores, {r['errors']} errors")
     except Exception as e:
-        results.append(f"Trustpilot: Error — {e}")
+        results.append(f"❌ Trustpilot: {e}")
 
     await update.message.reply_text(
-        "✅ <b>Scrape Complete</b>\n\n" + "\n".join(results),
+        "📊 <b>Scrape Complete</b>\n\n" + "\n".join(results),
         parse_mode='HTML'
     )
 
@@ -810,6 +976,9 @@ async def post_init(application):
     await application.bot.set_my_commands(commands)
     log_info("Bot commands registered ✓", tag="BOT")
 
+    # Log admin IDs for debugging
+    log_info(f"Admin user IDs: {ADMIN_USER_IDS}", tag="STARTUP")
+
 
 def create_bot():
     """Create and configure the bot application."""
@@ -834,8 +1003,10 @@ def create_bot():
     app.add_handler(CommandHandler("scams", cmd_scams))
 
     # Admin commands
+    app.add_handler(CommandHandler("admin", cmd_admin))
     app.add_handler(CommandHandler("stats", cmd_admin_stats))
     app.add_handler(CommandHandler("activate", cmd_admin_activate))
+    app.add_handler(CommandHandler("addvip", cmd_admin_addvip))
     app.add_handler(CommandHandler("broadcast", cmd_admin_broadcast))
     app.add_handler(CommandHandler("scrape", cmd_admin_scrape))
 

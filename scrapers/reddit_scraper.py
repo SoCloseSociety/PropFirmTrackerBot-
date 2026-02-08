@@ -1,6 +1,11 @@
 """
 PropFirmTracker Bot - Reddit Scraper
+=======================================
+Scrapes Reddit for prop firm mentions using OAuth API.
+Requires REDDIT_CLIENT_ID and REDDIT_CLIENT_SECRET in .env
+(free, create at https://www.reddit.com/prefs/apps/)
 """
+
 import re
 import time
 import random
@@ -13,31 +18,95 @@ from config import PROP_FIRMS, REDDIT_SUBREDDITS, REQUEST_TIMEOUT
 class RedditScraper:
     def __init__(self):
         self.session = requests.Session()
+        self.access_token = None
+        self.firm_names = {slug: cfg['name'].lower() for slug, cfg in PROP_FIRMS.items()}
+        self.results = {"posts_found": 0, "mentions": 0, "scam_alerts": 0, "errors": 0}
+
+        # Try OAuth first, fallback to unauthenticated
+        self._authenticate()
+
+    def _authenticate(self):
+        """Get Reddit OAuth access token (application-only)."""
+        try:
+            from config import REDDIT_CLIENT_ID, REDDIT_CLIENT_SECRET
+        except ImportError:
+            log_warn("REDDIT_CLIENT_ID/SECRET not in config — using unauthenticated mode", tag="SCRAPE")
+            self._setup_unauthenticated()
+            return
+
+        if not REDDIT_CLIENT_ID or not REDDIT_CLIENT_SECRET or REDDIT_CLIENT_ID == "YOUR_REDDIT_CLIENT_ID":
+            log_warn("Reddit OAuth not configured — using unauthenticated mode (may get 403)", tag="SCRAPE")
+            self._setup_unauthenticated()
+            return
+
+        try:
+            auth = requests.auth.HTTPBasicAuth(REDDIT_CLIENT_ID, REDDIT_CLIENT_SECRET)
+            data = {"grant_type": "client_credentials"}
+            headers = {"User-Agent": "PropFirmTracker/1.0 (by /u/PropFirmBot)"}
+
+            resp = requests.post(
+                "https://www.reddit.com/api/v1/access_token",
+                auth=auth, data=data, headers=headers, timeout=10
+            )
+            resp.raise_for_status()
+            token_data = resp.json()
+            self.access_token = token_data.get("access_token")
+
+            if self.access_token:
+                self.session.headers.update({
+                    "Authorization": f"bearer {self.access_token}",
+                    "User-Agent": "PropFirmTracker/1.0 (by /u/PropFirmBot)",
+                })
+                log_info("Reddit OAuth authenticated ✓", tag="SCRAPE")
+            else:
+                log_warn("Reddit OAuth: no token received", tag="SCRAPE")
+                self._setup_unauthenticated()
+
+        except Exception as e:
+            log_warn(f"Reddit OAuth failed: {e} — falling back to unauthenticated", tag="SCRAPE")
+            self._setup_unauthenticated()
+
+    def _setup_unauthenticated(self):
+        """Setup for unauthenticated requests (may get 403)."""
+        self.access_token = None
         self.session.headers.update({
             "User-Agent": "PropFirmTracker/1.0 (telegram bot; monitoring prop firm discussions)",
             "Accept": "application/json",
         })
-        self.firm_names = {slug: cfg['name'].lower() for slug, cfg in PROP_FIRMS.items()}
-        self.results = {"posts_found": 0, "mentions": 0, "scam_alerts": 0, "errors": 0}
 
     def _get_subreddit_posts(self, subreddit, sort="new", limit=25):
-        url = f"https://www.reddit.com/r/{subreddit}/{sort}.json?limit={limit}&raw_json=1"
+        """Fetch recent posts from a subreddit."""
+        if self.access_token:
+            # OAuth endpoint (higher rate limits, no 403)
+            url = f"https://oauth.reddit.com/r/{subreddit}/{sort}?limit={limit}&raw_json=1"
+        else:
+            # Public endpoint (may get 403)
+            url = f"https://www.reddit.com/r/{subreddit}/{sort}.json?limit={limit}&raw_json=1"
+
         try:
             response = self.session.get(url, timeout=REQUEST_TIMEOUT)
+
             if response.status_code == 429:
                 retry_after = int(response.headers.get('Retry-After', 10))
                 log_warn(f"Reddit rate limit, waiting {retry_after}s...", tag="SCRAPE")
                 time.sleep(retry_after)
                 response = self.session.get(url, timeout=REQUEST_TIMEOUT)
+
+            if response.status_code == 403:
+                if self.access_token:
+                    log_warn(f"r/{subreddit}: 403 even with OAuth — subreddit may be private", tag="SCRAPE")
+                else:
+                    log_warn(f"r/{subreddit}: 403 — add REDDIT_CLIENT_ID to .env for OAuth", tag="SCRAPE")
+                self.results["errors"] += 1
+                return []
+
             response.raise_for_status()
             data = response.json()
             posts = data.get('data', {}).get('children', [])
             return [p['data'] for p in posts if p.get('data')]
+
         except requests.exceptions.HTTPError as e:
-            if hasattr(e, 'response') and e.response is not None and e.response.status_code == 403:
-                log_warn(f"r/{subreddit}: Reddit blocked (403) — may need OAuth token", tag="SCRAPE")
-            else:
-                log_error(f"Failed to fetch r/{subreddit}: {e}", tag="SCRAPE")
+            log_error(f"Reddit HTTP error r/{subreddit}: {e}", tag="SCRAPE")
             self.results["errors"] += 1
             return []
         except Exception as e:
