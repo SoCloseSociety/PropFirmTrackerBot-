@@ -368,3 +368,467 @@
 2026-02-08 13:24:33 | [2m13:24:33[0m [96m[🔍 SCRAPE][0m Trustpilot scrape complete — Scraped: 0 | Score drops: 0 | Low scores: 0 | Errors: 10
 2026-02-08 13:24:33 | [2m13:24:33[0m [96m[🔍 SCRAPE][0m Trustpilot done: {'scraped': 0, 'score_drops': 0, 'low_scores': 0, 'errors': 10}
 2026-02-08 13:24:33 | [2m13:24:33[0m [93m[🔔 ALERT][0m Sending 17 alerts to premium channel...
+2026-02-08 16:16:36 | [2m16:16:36[0m [1m[92m[🚀 STARTUP][0m Starting PropFirmTracker Bot...
+2026-02-08 16:16:36 | [2m16:16:36[0m [1m[92m[🚀 STARTUP][0m Setting up database...
+2026-02-08 16:16:36 | [2m16:16:36[0m [2m[97m[💾 DB][0m Initializing database...
+2026-02-08 16:16:36 | [2m16:16:36[0m [2m[97m[💾 DB][0m Database initialized successfully ✓
+2026-02-08 16:16:36 | [2m16:16:36[0m [1m[92m[🚀 STARTUP][0m Setting up Telegram bot...
+2026-02-08 16:16:36 | [2m16:16:36[0m [1m[92m[🚀 STARTUP][0m Creating bot application...
+2026-02-08 16:16:36 | [2m16:16:36[0m [1m[92m[🚀 STARTUP][0m Bot handlers registered ✓
+2026-02-08 16:16:36 | [2m16:16:36[0m [1m[92m[🚀 STARTUP][0m Starting polling...
+2026-02-08 16:16:36 | [2m16:16:36[0m [1m[96m[🤖 BOT][0m Bot commands registered ✓
+2026-02-08 16:16:36 | [2m16:16:36[0m [1m[92m[🚀 STARTUP][0m Admin user IDs: [909302789]
+2026-02-08 16:16:36 | [2m16:16:36[0m [1m[92m[🚀 STARTUP][0m Scheduler background task started ✓
+2026-02-08 16:16:36 | [2m16:16:36[0m [1m[92m[🚀 STARTUP][0m ═══════════════════════════════════════
+2026-02-08 16:16:36 | [2m16:16:36[0m [1m[92m[🚀 STARTUP][0m 🚀 PropFirmTracker Bot is LIVE!
+2026-02-08 16:16:36 | [2m16:16:36[0m [1m[92m[🚀 STARTUP][0m ═══════════════════════════════════════
+2026-02-08 16:16:36 | [2m16:16:36[0m [1m[92m[🚀 STARTUP][0m Scheduler started — scraping every 3h
+2026-02-08 16:17:06 | [2m16:17:06[0m [96m[🔍 SCRAPE][0m ═══ Starting scrape cycle at 16:17:06 ═══
+2026-02-08 16:17:06 | [2m16:17:06[0m [96m[🔍 SCRAPE][0m Starting full scrape of 10 prop firms...
+2026-02-08 16:17:06 | [2m16:17:06[0m [96m[🔍 SCRAPE][0m Scraping FTMO...
+2026-02-08 16:17:06 | [2m16:17:06[0m [97m[📌 DIFF][0m Change detected: ftmo/pricing (hash changed)
+2026-02-08 16:17:06 | [2m16:17:06[0m [97m[📌 DIFF][0m Change recorded: ftmo - content_update
+2026-02-08 16:17:07 | [2m16:17:07[0m [97m[📌 DIFF][0m Change detected: ftmo/rules (hash changed)
+2026-02-08 16:17:07 | [2m16:17:07[0m [97m[📌 DIFF][0m Change recorded: ftmo - content_update
+2026-02-08 16:17:10 | [2m16:17:10[0m [97m[📌 DIFF][0m Change detected: ftmo/homepage (hash changed)
+2026-02-08 16:17:10 | [2m16:17:10[0m [97m[📌 DIFF][0m Change recorded: ftmo - content_update
+2026-02-08 16:17:12 | [2m16:17:12[0m [97m[📌 DIFF][0m Change detected: ftmo/blog (hash changed)
+2026-02-08 16:17:12 | [2m16:17:12[0m [97m[📌 DIFF][0m Change recorded: ftmo - content_update
+2026-02-08 16:17:17 | [2m16:17:17[0m [96m[🔍 SCRAPE][0m Scraping Funded Next...
+2026-02-08 16:17:35 | [2m16:17:35[0m [96m[🔍 SCRAPE][0m Scraping The 5%ers...
+2026-02-08 16:17:47 | [2m16:17:47[0m [96m[🔍 SCRAPE][0m Scraping MyFundedFX...
+2026-02-08 16:17:48 | [2m16:17:48[0m [97m[📌 DIFF][0m Change detected: myfundedfx/pricing (hash changed)
+2026-02-08 16:17:48 | [2m16:17:48[0m [97m[📌 DIFF][0m Change recorded: myfundedfx - content_update
+2026-02-08 16:17:49 | [2m16:17:49[0m [97m[📌 DIFF][0m Change detected: myfundedfx/rules (hash changed)
+2026-02-08 16:17:49 | [2m16:17:49[0m [97m[📌 DIFF][0m Change recorded: myfundedfx - content_update
+2026-02-08 16:17:51 | [2m16:17:51[0m [97m[📌 DIFF][0m Change detected: myfundedfx/homepage (hash changed)
+2026-02-08 16:17:51 | [2m16:17:51[0m [97m[📌 DIFF][0m Change recorded: myfundedfx - content_update
+2026-02-08 16:17:53 | [2m16:17:53[0m [97m[📌 DIFF][0m Change detected: myfundedfx/blog (hash changed)
+2026-02-08 16:17:53 | [2m16:17:53[0m [97m[📌 DIFF][0m Change recorded: myfundedfx - content_update
+2026-02-08 16:17:58 | [2m16:17:58[0m [96m[🔍 SCRAPE][0m Scraping TopStep...
+2026-02-08 16:17:59 | [2m16:17:59[0m [97m[📌 DIFF][0m Change detected: topstep/pricing (hash changed)
+2026-02-08 16:17:59 | [2m16:17:59[0m [97m[📌 DIFF][0m Change recorded: topstep - content_update
+2026-02-08 16:18:01 | [2m16:18:01[0m [97m[📌 DIFF][0m Change detected: topstep/rules (hash changed)
+2026-02-08 16:18:01 | [2m16:18:01[0m [97m[📌 DIFF][0m Change recorded: topstep - content_update
+2026-02-08 16:18:02 | [2m16:18:02[0m [97m[📌 DIFF][0m Change detected: topstep/homepage (hash changed)
+2026-02-08 16:18:02 | [2m16:18:02[0m [97m[📌 DIFF][0m Change recorded: topstep - content_update
+2026-02-08 16:18:04 | [2m16:18:04[0m [97m[📌 DIFF][0m Change detected: topstep/blog (hash changed)
+2026-02-08 16:18:05 | [2m16:18:05[0m [97m[📌 DIFF][0m Change recorded: topstep - content_update
+2026-02-08 16:18:10 | [2m16:18:10[0m [96m[🔍 SCRAPE][0m Scraping Apex Trader Funding...
+2026-02-08 16:18:12 | [2m16:18:12[0m [96m[🔍 SCRAPE][0m Scraping E8 Funding...
+2026-02-08 16:18:16 | [2m16:18:16[0m [96m[🔍 SCRAPE][0m Scraping Funding Pips...
+2026-02-08 16:18:17 | [2m16:18:17[0m [97m[📌 DIFF][0m Change detected: fundingpips/pricing (hash changed)
+2026-02-08 16:18:17 | [2m16:18:17[0m [97m[📌 DIFF][0m Change recorded: fundingpips - content_update
+2026-02-08 16:18:19 | [2m16:18:19[0m [97m[📌 DIFF][0m Change detected: fundingpips/homepage (hash changed)
+2026-02-08 16:18:19 | [2m16:18:19[0m [97m[📌 DIFF][0m Change recorded: fundingpips - content_update
+2026-02-08 16:18:27 | [2m16:18:27[0m [96m[🔍 SCRAPE][0m Scraping Goat Funded Trader...
+2026-02-08 16:18:34 | [2m16:18:34[0m [96m[🔍 SCRAPE][0m Scraping Blueberry Funded...
+2026-02-08 16:18:34 | [2m16:18:34[0m [97m[📌 DIFF][0m Change detected: blueberry_funded/pricing (hash changed)
+2026-02-08 16:18:34 | [2m16:18:34[0m [97m[📌 DIFF][0m Change recorded: blueberry_funded - content_update
+2026-02-08 16:18:36 | [2m16:18:36[0m [97m[📌 DIFF][0m Change detected: blueberry_funded/homepage (hash changed)
+2026-02-08 16:18:36 | [2m16:18:36[0m [97m[📌 DIFF][0m Change recorded: blueberry_funded - content_update
+2026-02-08 16:18:41 | [2m16:18:41[0m [96m[🔍 SCRAPE][0m Scrape complete — Pages: 27 | Changes: 16 | Promos: 0 | Errors: 0
+2026-02-08 16:18:41 | [2m16:18:41[0m [96m[🔍 SCRAPE][0m Prop firms done: {'scraped': 27, 'changes': 16, 'errors': 0, 'promos': 0}
+2026-02-08 16:18:41 | [2m16:18:41[0m [96m[🔍 SCRAPE][0m REDDIT_CLIENT_ID/SECRET not in config — using unauthenticated mode
+2026-02-08 16:18:41 | [2m16:18:41[0m [96m[🔍 SCRAPE][0m Starting Reddit scrape of 4 subreddits...
+2026-02-08 16:18:41 | [2m16:18:41[0m [96m[🔍 SCRAPE][0m Scraping r/FundedTrading...
+2026-02-08 16:18:41 | [2m16:18:41[0m [96m[🔍 SCRAPE][0m r/FundedTrading: 403 — add REDDIT_CLIENT_ID to .env for OAuth
+2026-02-08 16:18:45 | [2m16:18:45[0m [96m[🔍 SCRAPE][0m Scraping r/proptrading...
+2026-02-08 16:18:45 | [2m16:18:45[0m [96m[🔍 SCRAPE][0m r/proptrading: 403 — add REDDIT_CLIENT_ID to .env for OAuth
+2026-02-08 16:18:48 | [2m16:18:48[0m [96m[🔍 SCRAPE][0m Scraping r/Forex...
+2026-02-08 16:18:48 | [2m16:18:48[0m [96m[🔍 SCRAPE][0m r/Forex: 403 — add REDDIT_CLIENT_ID to .env for OAuth
+2026-02-08 16:18:52 | [2m16:18:52[0m [96m[🔍 SCRAPE][0m Scraping r/FuturesTrading...
+2026-02-08 16:18:52 | [2m16:18:52[0m [96m[🔍 SCRAPE][0m r/FuturesTrading: 403 — add REDDIT_CLIENT_ID to .env for OAuth
+2026-02-08 16:18:56 | [2m16:18:56[0m [96m[🔍 SCRAPE][0m Reddit scrape complete — Posts: 0 | Mentions: 0 | Scam alerts: 0 | Errors: 4
+2026-02-08 16:18:56 | [2m16:18:56[0m [96m[🔍 SCRAPE][0m Reddit done: {'posts_found': 0, 'mentions': 0, 'scam_alerts': 0, 'errors': 4}
+2026-02-08 16:18:56 | [2m16:18:56[0m [96m[🔍 SCRAPE][0m Starting Trustpilot scrape of 10 firms...
+2026-02-08 16:19:44 | [2m16:19:44[0m [96m[🔍 SCRAPE][0m Trustpilot scrape complete — Scraped: 0 | Score drops: 0 | Low scores: 0 | Errors: 10
+2026-02-08 16:19:44 | [2m16:19:44[0m [96m[🔍 SCRAPE][0m Trustpilot done: {'scraped': 0, 'score_drops': 0, 'low_scores': 0, 'errors': 10}
+2026-02-08 16:19:44 | [2m16:19:44[0m [93m[🔔 ALERT][0m Sending 33 alerts to premium channel...
+2026-02-08 16:30:21 | [2m16:30:21[0m [1m[92m[🚀 STARTUP][0m Starting PropFirmTracker Bot...
+2026-02-08 16:30:21 | [2m16:30:21[0m [1m[92m[🚀 STARTUP][0m Setting up database...
+2026-02-08 16:30:21 | [2m16:30:21[0m [2m[97m[💾 DB][0m Initializing database...
+2026-02-08 16:30:21 | [2m16:30:21[0m [2m[97m[💾 DB][0m Database initialized successfully ✓
+2026-02-08 16:30:21 | [2m16:30:21[0m [1m[92m[🚀 STARTUP][0m Setting up Telegram bot...
+2026-02-08 16:30:21 | [2m16:30:21[0m [1m[92m[🚀 STARTUP][0m Creating bot application...
+2026-02-08 16:30:22 | [2m16:30:22[0m [1m[92m[🚀 STARTUP][0m Bot handlers registered ✓
+2026-02-08 16:30:22 | [2m16:30:22[0m [1m[92m[🚀 STARTUP][0m Starting polling...
+2026-02-08 16:30:22 | [2m16:30:22[0m [1m[96m[🤖 BOT][0m Bot commands registered ✓
+2026-02-08 16:30:22 | [2m16:30:22[0m [1m[92m[🚀 STARTUP][0m Admin user IDs: [909302789]
+2026-02-08 16:30:22 | [2m16:30:22[0m [1m[92m[🚀 STARTUP][0m Scheduler background task started ✓
+2026-02-08 16:30:22 | [2m16:30:22[0m [1m[92m[🚀 STARTUP][0m ═══════════════════════════════════════
+2026-02-08 16:30:22 | [2m16:30:22[0m [1m[92m[🚀 STARTUP][0m 🚀 PropFirmTracker Bot is LIVE!
+2026-02-08 16:30:22 | [2m16:30:22[0m [1m[92m[🚀 STARTUP][0m ═══════════════════════════════════════
+2026-02-08 16:30:22 | [2m16:30:22[0m [1m[92m[🚀 STARTUP][0m Scheduler started — scraping every 3h
+2026-02-08 16:30:52 | [2m16:30:52[0m [96m[🔍 SCRAPE][0m ═══ Starting scrape cycle at 16:30:52 ═══
+2026-02-08 16:30:52 | [2m16:30:52[0m [96m[🔍 SCRAPE][0m Starting full scrape of 10 prop firms...
+2026-02-08 16:30:52 | [2m16:30:52[0m [96m[🔍 SCRAPE][0m Scraping FTMO...
+2026-02-08 16:30:52 | [2m16:30:52[0m [97m[📌 DIFF][0m Change detected: ftmo/pricing (hash changed)
+2026-02-08 16:30:52 | [2m16:30:52[0m [97m[📌 DIFF][0m Change recorded: ftmo - content_update
+2026-02-08 16:30:54 | [2m16:30:54[0m [97m[📌 DIFF][0m Change detected: ftmo/rules (hash changed)
+2026-02-08 16:30:54 | [2m16:30:54[0m [97m[📌 DIFF][0m Change recorded: ftmo - content_update
+2026-02-08 16:30:56 | [2m16:30:56[0m [97m[📌 DIFF][0m Change detected: ftmo/homepage (hash changed)
+2026-02-08 16:30:56 | [2m16:30:56[0m [97m[📌 DIFF][0m Change recorded: ftmo - content_update
+2026-02-08 16:30:59 | [2m16:30:59[0m [97m[📌 DIFF][0m Change detected: ftmo/blog (hash changed)
+2026-02-08 16:30:59 | [2m16:30:59[0m [97m[📌 DIFF][0m Change recorded: ftmo - content_update
+2026-02-08 16:31:05 | [2m16:31:05[0m [96m[🔍 SCRAPE][0m Scraping Funded Next...
+2026-02-08 16:31:22 | [2m16:31:22[0m [96m[🔍 SCRAPE][0m Scraping The 5%ers...
+2026-02-08 16:31:33 | [2m16:31:33[0m [96m[🔍 SCRAPE][0m Scraping MyFundedFX...
+2026-02-08 16:31:33 | [2m16:31:33[0m [97m[📌 DIFF][0m Change detected: myfundedfx/pricing (hash changed)
+2026-02-08 16:31:33 | [2m16:31:33[0m [97m[📌 DIFF][0m Change recorded: myfundedfx - content_update
+2026-02-08 16:31:35 | [2m16:31:35[0m [97m[📌 DIFF][0m Change detected: myfundedfx/rules (hash changed)
+2026-02-08 16:31:35 | [2m16:31:35[0m [97m[📌 DIFF][0m Change recorded: myfundedfx - content_update
+2026-02-08 16:31:38 | [2m16:31:38[0m [97m[📌 DIFF][0m Change detected: myfundedfx/homepage (hash changed)
+2026-02-08 16:31:38 | [2m16:31:38[0m [97m[📌 DIFF][0m Change recorded: myfundedfx - content_update
+2026-02-08 16:31:39 | [2m16:31:39[0m [97m[📌 DIFF][0m Change detected: myfundedfx/blog (hash changed)
+2026-02-08 16:31:39 | [2m16:31:39[0m [97m[📌 DIFF][0m Change recorded: myfundedfx - content_update
+2026-02-08 16:31:44 | [2m16:31:44[0m [96m[🔍 SCRAPE][0m Scraping TopStep...
+2026-02-08 16:31:44 | [2m16:31:44[0m [97m[📌 DIFF][0m Change detected: topstep/pricing (hash changed)
+2026-02-08 16:31:44 | [2m16:31:44[0m [97m[📌 DIFF][0m Change recorded: topstep - content_update
+2026-02-08 16:31:46 | [2m16:31:46[0m [97m[📌 DIFF][0m Change detected: topstep/rules (hash changed)
+2026-02-08 16:31:46 | [2m16:31:46[0m [97m[📌 DIFF][0m Change recorded: topstep - content_update
+2026-02-08 16:31:48 | [2m16:31:48[0m [97m[📌 DIFF][0m Change detected: topstep/homepage (hash changed)
+2026-02-08 16:31:48 | [2m16:31:48[0m [97m[📌 DIFF][0m Change recorded: topstep - content_update
+2026-02-08 16:31:50 | [2m16:31:50[0m [97m[📌 DIFF][0m Change detected: topstep/blog (hash changed)
+2026-02-08 16:31:50 | [2m16:31:50[0m [97m[📌 DIFF][0m Change recorded: topstep - content_update
+2026-02-08 16:31:55 | [2m16:31:55[0m [96m[🔍 SCRAPE][0m Scraping Apex Trader Funding...
+2026-02-08 16:31:57 | [2m16:31:57[0m [96m[🔍 SCRAPE][0m Scraping E8 Funding...
+2026-02-08 16:32:01 | [2m16:32:01[0m [96m[🔍 SCRAPE][0m Scraping Funding Pips...
+2026-02-08 16:32:02 | [2m16:32:02[0m [97m[📌 DIFF][0m Change detected: fundingpips/pricing (hash changed)
+2026-02-08 16:32:02 | [2m16:32:02[0m [97m[📌 DIFF][0m Change recorded: fundingpips - content_update
+2026-02-08 16:32:04 | [2m16:32:04[0m [97m[📌 DIFF][0m Change detected: fundingpips/homepage (hash changed)
+2026-02-08 16:32:04 | [2m16:32:04[0m [97m[📌 DIFF][0m Change recorded: fundingpips - content_update
+2026-02-08 16:32:06 | [2m16:32:06[0m [97m[📌 DIFF][0m Change detected: fundingpips/blog (hash changed)
+2026-02-08 16:32:06 | [2m16:32:06[0m [97m[📌 DIFF][0m Change recorded: fundingpips - content_update
+2026-02-08 16:32:11 | [2m16:32:11[0m [96m[🔍 SCRAPE][0m Scraping Goat Funded Trader...
+2026-02-08 16:32:18 | [2m16:32:18[0m [96m[🔍 SCRAPE][0m Scraping Blueberry Funded...
+2026-02-08 16:32:19 | [2m16:32:19[0m [97m[📌 DIFF][0m Change detected: blueberry_funded/pricing (hash changed)
+2026-02-08 16:32:19 | [2m16:32:19[0m [97m[📌 DIFF][0m Change recorded: blueberry_funded - content_update
+2026-02-08 16:32:20 | [2m16:32:20[0m [97m[📌 DIFF][0m Change detected: blueberry_funded/homepage (hash changed)
+2026-02-08 16:32:20 | [2m16:32:20[0m [97m[📌 DIFF][0m Change recorded: blueberry_funded - content_update
+2026-02-08 16:32:26 | [2m16:32:26[0m [96m[🔍 SCRAPE][0m Scrape complete — Pages: 27 | Changes: 17 | Promos: 0 | Errors: 0
+2026-02-08 16:32:26 | [2m16:32:26[0m [96m[🔍 SCRAPE][0m Prop firms done: {'scraped': 27, 'changes': 17, 'errors': 0, 'promos': 0}
+2026-02-08 16:32:26 | [2m16:32:26[0m [96m[🔍 SCRAPE][0m REDDIT_CLIENT_ID/SECRET not in config — using unauthenticated mode
+2026-02-08 16:32:26 | [2m16:32:26[0m [96m[🔍 SCRAPE][0m Starting Reddit scrape of 4 subreddits...
+2026-02-08 16:32:26 | [2m16:32:26[0m [96m[🔍 SCRAPE][0m Scraping r/FundedTrading...
+2026-02-08 16:32:26 | [2m16:32:26[0m [96m[🔍 SCRAPE][0m r/FundedTrading: 403 — add REDDIT_CLIENT_ID to .env for OAuth
+2026-02-08 16:32:30 | [2m16:32:30[0m [96m[🔍 SCRAPE][0m Scraping r/proptrading...
+2026-02-08 16:32:30 | [2m16:32:30[0m [96m[🔍 SCRAPE][0m r/proptrading: 403 — add REDDIT_CLIENT_ID to .env for OAuth
+2026-02-08 16:32:32 | [2m16:32:32[0m [96m[🔍 SCRAPE][0m Scraping r/Forex...
+2026-02-08 16:32:32 | [2m16:32:32[0m [96m[🔍 SCRAPE][0m r/Forex: 403 — add REDDIT_CLIENT_ID to .env for OAuth
+2026-02-08 16:32:35 | [2m16:32:35[0m [96m[🔍 SCRAPE][0m Scraping r/FuturesTrading...
+2026-02-08 16:32:35 | [2m16:32:35[0m [96m[🔍 SCRAPE][0m r/FuturesTrading: 403 — add REDDIT_CLIENT_ID to .env for OAuth
+2026-02-08 16:32:38 | [2m16:32:38[0m [96m[🔍 SCRAPE][0m Reddit scrape complete — Posts: 0 | Mentions: 0 | Scam alerts: 0 | Errors: 4
+2026-02-08 16:32:38 | [2m16:32:38[0m [96m[🔍 SCRAPE][0m Reddit done: {'posts_found': 0, 'mentions': 0, 'scam_alerts': 0, 'errors': 4}
+2026-02-08 16:32:38 | [2m16:32:38[0m [96m[🔍 SCRAPE][0m Starting Trustpilot scrape of 10 firms...
+2026-02-08 16:33:24 | [2m16:33:24[0m [96m[🔍 SCRAPE][0m Trustpilot scrape complete — Scraped: 0 | Score drops: 0 | Low scores: 0 | Errors: 10
+2026-02-08 16:33:24 | [2m16:33:24[0m [96m[🔍 SCRAPE][0m Trustpilot done: {'scraped': 0, 'score_drops': 0, 'low_scores': 0, 'errors': 10}
+2026-02-08 16:33:24 | [2m16:33:24[0m [93m[🔔 ALERT][0m Sending 50 alerts to premium channel...
+2026-02-08 16:33:47 | [2m16:33:47[0m [93m[🔔 ALERT][0m Send failed: Flood control exceeded. Retry in 37 seconds
+2026-02-08 16:33:48 | [2m16:33:48[0m [93m[🔔 ALERT][0m Send failed: Flood control exceeded. Retry in 36 seconds
+2026-02-08 16:33:49 | [2m16:33:49[0m [93m[🔔 ALERT][0m Send failed: Flood control exceeded. Retry in 35 seconds
+2026-02-08 16:33:50 | [2m16:33:50[0m [93m[🔔 ALERT][0m Send failed: Flood control exceeded. Retry in 34 seconds
+2026-02-08 16:33:51 | [2m16:33:51[0m [93m[🔔 ALERT][0m Send failed: Flood control exceeded. Retry in 33 seconds
+2026-02-08 16:33:53 | [2m16:33:53[0m [93m[🔔 ALERT][0m Send failed: Flood control exceeded. Retry in 31 seconds
+2026-02-08 16:33:54 | [2m16:33:54[0m [93m[🔔 ALERT][0m Send failed: Flood control exceeded. Retry in 30 seconds
+2026-02-08 16:33:55 | [2m16:33:55[0m [93m[🔔 ALERT][0m Send failed: Flood control exceeded. Retry in 29 seconds
+2026-02-08 16:33:56 | [2m16:33:56[0m [93m[🔔 ALERT][0m Send failed: Flood control exceeded. Retry in 28 seconds
+2026-02-08 16:33:57 | [2m16:33:57[0m [93m[🔔 ALERT][0m Send failed: Flood control exceeded. Retry in 27 seconds
+2026-02-08 16:33:58 | [2m16:33:58[0m [93m[🔔 ALERT][0m Send failed: Flood control exceeded. Retry in 26 seconds
+2026-02-08 16:33:59 | [2m16:33:59[0m [93m[🔔 ALERT][0m Send failed: Flood control exceeded. Retry in 25 seconds
+2026-02-08 16:34:00 | [2m16:34:00[0m [93m[🔔 ALERT][0m Send failed: Flood control exceeded. Retry in 24 seconds
+2026-02-08 16:34:02 | [2m16:34:02[0m [93m[🔔 ALERT][0m Send failed: Flood control exceeded. Retry in 23 seconds
+2026-02-08 16:34:03 | [2m16:34:03[0m [93m[🔔 ALERT][0m Send failed: Flood control exceeded. Retry in 21 seconds
+2026-02-08 16:34:04 | [2m16:34:04[0m [93m[🔔 ALERT][0m Send failed: Flood control exceeded. Retry in 20 seconds
+2026-02-08 16:34:05 | [2m16:34:05[0m [93m[🔔 ALERT][0m Send failed: Flood control exceeded. Retry in 19 seconds
+2026-02-08 16:34:06 | [2m16:34:06[0m [93m[🔔 ALERT][0m Send failed: Flood control exceeded. Retry in 18 seconds
+2026-02-08 16:34:07 | [2m16:34:07[0m [93m[🔔 ALERT][0m Send failed: Flood control exceeded. Retry in 17 seconds
+2026-02-08 16:34:08 | [2m16:34:08[0m [93m[🔔 ALERT][0m Send failed: Flood control exceeded. Retry in 16 seconds
+2026-02-08 16:34:09 | [2m16:34:09[0m [93m[🔔 ALERT][0m Send failed: Flood control exceeded. Retry in 15 seconds
+2026-02-08 16:34:10 | [2m16:34:10[0m [93m[🔔 ALERT][0m Send failed: Flood control exceeded. Retry in 14 seconds
+2026-02-08 16:34:11 | [2m16:34:11[0m [93m[🔔 ALERT][0m Send failed: Flood control exceeded. Retry in 13 seconds
+2026-02-08 16:34:12 | [2m16:34:12[0m [93m[🔔 ALERT][0m Send failed: Flood control exceeded. Retry in 12 seconds
+2026-02-08 16:34:13 | [2m16:34:13[0m [93m[🔔 ALERT][0m Send failed: Flood control exceeded. Retry in 11 seconds
+2026-02-08 16:34:14 | [2m16:34:14[0m [93m[🔔 ALERT][0m Send failed: Flood control exceeded. Retry in 10 seconds
+2026-02-08 16:34:15 | [2m16:34:15[0m [93m[🔔 ALERT][0m Send failed: Flood control exceeded. Retry in 9 seconds
+2026-02-08 16:34:21 | [2m16:34:21[0m [93m[🔔 ALERT][0m Send failed: Timed out
+2026-02-08 16:34:27 | [2m16:34:27[0m [93m[🔔 ALERT][0m Alerts sent ✓ (22/50)
+2026-02-08 16:34:27 | [2m16:34:27[0m [93m[🔔 ALERT][0m Alerts sent ✓
+2026-02-08 16:34:27 | [2m16:34:27[0m [96m[🔍 SCRAPE][0m ═══ Scrape cycle complete ═══
+2026-02-08 16:34:27 | [2m16:34:27[0m [96m[🔍 SCRAPE][0m Next scrape in 3h...
+2026-02-08 16:44:32 | [2m16:44:32[0m [1m[96m[🤖 BOT][0m User started bot: 909302789 (@Ox00n4)
+2026-02-08 16:51:37 | [2m16:51:37[0m [1m[92m[🚀 STARTUP][0m Scheduler stopped
+2026-02-08 16:51:37 | [2m16:51:37[0m [1m[92m[🚀 STARTUP][0m Bot shutting down...
+2026-02-08 16:53:31 | [2m16:53:31[0m [1m[92m[🚀 STARTUP][0m Starting PropFirmTracker Bot...
+2026-02-08 16:53:31 | [2m16:53:31[0m [1m[92m[🚀 STARTUP][0m Setting up database...
+2026-02-08 16:53:31 | [2m16:53:31[0m [2m[97m[💾 DB][0m Initializing database...
+2026-02-08 16:53:31 | [2m16:53:31[0m [2m[97m[💾 DB][0m Database initialized successfully ✓
+2026-02-08 16:53:31 | [2m16:53:31[0m [1m[92m[🚀 STARTUP][0m Setting up Telegram bot...
+2026-02-08 16:53:31 | [2m16:53:31[0m [1m[92m[🚀 STARTUP][0m Creating bot...
+2026-02-08 16:53:31 | [2m16:53:31[0m [1m[92m[🚀 STARTUP][0m Handlers ✓
+2026-02-08 16:53:31 | [2m16:53:31[0m [1m[92m[🚀 STARTUP][0m Starting polling...
+2026-02-08 16:53:31 | [2m16:53:31[0m [1m[92m[🚀 STARTUP][0m Bot ready ✓ Admin: [909302789]
+2026-02-08 16:53:31 | [2m16:53:31[0m [1m[92m[🚀 STARTUP][0m Scheduler ✓
+2026-02-08 16:53:31 | [2m16:53:31[0m [1m[92m[🚀 STARTUP][0m ═══════════════════════════════════════
+2026-02-08 16:53:31 | [2m16:53:31[0m [1m[92m[🚀 STARTUP][0m 🚀 PropFirmTracker Bot is LIVE!
+2026-02-08 16:53:31 | [2m16:53:31[0m [1m[92m[🚀 STARTUP][0m ═══════════════════════════════════════
+2026-02-08 16:53:31 | [2m16:53:31[0m [1m[92m[🚀 STARTUP][0m Scheduler: every 3h
+2026-02-08 16:54:01 | [2m16:54:01[0m [96m[🔍 SCRAPE][0m ═══ Scrape 16:54:01 ═══
+2026-02-08 16:54:01 | [2m16:54:01[0m [96m[🔍 SCRAPE][0m Starting full scrape of 10 prop firms...
+2026-02-08 16:54:01 | [2m16:54:01[0m [96m[🔍 SCRAPE][0m Scraping FTMO...
+2026-02-08 16:54:01 | [2m16:54:01[0m [97m[📌 DIFF][0m Change detected: ftmo/pricing (hash changed)
+2026-02-08 16:54:01 | [2m16:54:01[0m [97m[📌 DIFF][0m Change recorded: ftmo - content_update
+2026-02-08 16:54:04 | [2m16:54:04[0m [97m[📌 DIFF][0m Change detected: ftmo/rules (hash changed)
+2026-02-08 16:54:04 | [2m16:54:04[0m [97m[📌 DIFF][0m Change recorded: ftmo - content_update
+2026-02-08 16:54:06 | [2m16:54:06[0m [97m[📌 DIFF][0m Change detected: ftmo/homepage (hash changed)
+2026-02-08 16:54:06 | [2m16:54:06[0m [97m[📌 DIFF][0m Change recorded: ftmo - content_update
+2026-02-08 16:54:09 | [2m16:54:09[0m [97m[📌 DIFF][0m Change detected: ftmo/blog (hash changed)
+2026-02-08 16:54:09 | [2m16:54:09[0m [97m[📌 DIFF][0m Change recorded: ftmo - content_update
+2026-02-08 16:54:14 | [2m16:54:14[0m [96m[🔍 SCRAPE][0m Scraping Funded Next...
+2026-02-08 16:54:31 | [2m16:54:31[0m [96m[🔍 SCRAPE][0m Scraping The 5%ers...
+2026-02-08 16:54:40 | [2m16:54:40[0m [96m[🔍 SCRAPE][0m Scraping MyFundedFX...
+2026-02-08 16:54:41 | [2m16:54:41[0m [97m[📌 DIFF][0m Change detected: myfundedfx/pricing (hash changed)
+2026-02-08 16:54:41 | [2m16:54:41[0m [97m[📌 DIFF][0m Change recorded: myfundedfx - content_update
+2026-02-08 16:54:43 | [2m16:54:43[0m [97m[📌 DIFF][0m Change detected: myfundedfx/rules (hash changed)
+2026-02-08 16:54:43 | [2m16:54:43[0m [97m[📌 DIFF][0m Change recorded: myfundedfx - content_update
+2026-02-08 16:54:46 | [2m16:54:46[0m [97m[📌 DIFF][0m Change detected: myfundedfx/homepage (hash changed)
+2026-02-08 16:54:46 | [2m16:54:46[0m [97m[📌 DIFF][0m Change recorded: myfundedfx - content_update
+2026-02-08 16:54:50 | [2m16:54:50[0m [97m[📌 DIFF][0m Change detected: myfundedfx/blog (hash changed)
+2026-02-08 16:54:50 | [2m16:54:50[0m [97m[📌 DIFF][0m Change recorded: myfundedfx - content_update
+2026-02-08 16:54:55 | [2m16:54:55[0m [96m[🔍 SCRAPE][0m Scraping TopStep...
+2026-02-08 16:54:55 | [2m16:54:55[0m [97m[📌 DIFF][0m Change detected: topstep/pricing (hash changed)
+2026-02-08 16:54:55 | [2m16:54:55[0m [97m[📌 DIFF][0m Change recorded: topstep - content_update
+2026-02-08 16:54:58 | [2m16:54:58[0m [97m[📌 DIFF][0m Change detected: topstep/rules (hash changed)
+2026-02-08 16:54:58 | [2m16:54:58[0m [97m[📌 DIFF][0m Change recorded: topstep - content_update
+2026-02-08 16:55:00 | [2m16:55:00[0m [97m[📌 DIFF][0m Change detected: topstep/homepage (hash changed)
+2026-02-08 16:55:00 | [2m16:55:00[0m [97m[📌 DIFF][0m Change recorded: topstep - content_update
+2026-02-08 16:55:02 | [2m16:55:02[0m [97m[📌 DIFF][0m Change detected: topstep/blog (hash changed)
+2026-02-08 16:55:02 | [2m16:55:02[0m [97m[📌 DIFF][0m Change recorded: topstep - content_update
+2026-02-08 16:55:08 | [2m16:55:08[0m [96m[🔍 SCRAPE][0m Scraping Apex Trader Funding...
+2026-02-08 16:55:11 | [2m16:55:11[0m [96m[🔍 SCRAPE][0m Scraping E8 Funding...
+2026-02-08 16:55:14 | [2m16:55:14[0m [96m[🔍 SCRAPE][0m Scraping Funding Pips...
+2026-02-08 16:55:14 | [2m16:55:14[0m [97m[📌 DIFF][0m Change detected: fundingpips/pricing (hash changed)
+2026-02-08 16:55:14 | [2m16:55:14[0m [97m[📌 DIFF][0m Change recorded: fundingpips - content_update
+2026-02-08 16:55:16 | [2m16:55:16[0m [97m[📌 DIFF][0m Change detected: fundingpips/homepage (hash changed)
+2026-02-08 16:55:16 | [2m16:55:16[0m [97m[📌 DIFF][0m Change recorded: fundingpips - content_update
+2026-02-08 16:55:18 | [2m16:55:18[0m [97m[📌 DIFF][0m Change detected: fundingpips/blog (hash changed)
+2026-02-08 16:55:18 | [2m16:55:18[0m [97m[📌 DIFF][0m Change recorded: fundingpips - content_update
+2026-02-08 16:55:23 | [2m16:55:23[0m [96m[🔍 SCRAPE][0m Scraping Goat Funded Trader...
+2026-02-08 16:55:31 | [2m16:55:31[0m [96m[🔍 SCRAPE][0m Scraping Blueberry Funded...
+2026-02-08 16:55:31 | [2m16:55:31[0m [97m[📌 DIFF][0m Change detected: blueberry_funded/pricing (hash changed)
+2026-02-08 16:55:31 | [2m16:55:31[0m [97m[📌 DIFF][0m Change recorded: blueberry_funded - content_update
+2026-02-08 16:55:32 | [2m16:55:32[0m [97m[📌 DIFF][0m Change detected: blueberry_funded/homepage (hash changed)
+2026-02-08 16:55:32 | [2m16:55:32[0m [97m[📌 DIFF][0m Change recorded: blueberry_funded - content_update
+2026-02-08 16:55:37 | [2m16:55:37[0m [96m[🔍 SCRAPE][0m Scrape complete — Pages: 27 | Changes: 17 | Promos: 0 | Errors: 0
+2026-02-08 16:55:37 | [2m16:55:37[0m [96m[🔍 SCRAPE][0m Prop firms: {'scraped': 27, 'changes': 17, 'errors': 0, 'promos': 0}
+2026-02-08 16:55:37 | [2m16:55:37[0m [96m[🔍 SCRAPE][0m Reddit RSS (4 subs)...
+2026-02-08 16:55:37 | [2m16:55:37[0m [96m[🔍 SCRAPE][0m Scraping r/FundedTrading...
+2026-02-08 16:55:41 | [2m16:55:41[0m [96m[🔍 SCRAPE][0m Scraping r/proptrading...
+2026-02-08 16:55:45 | [2m16:55:45[0m [96m[🔍 SCRAPE][0m Scraping r/Forex...
+2026-02-08 16:55:46 | [2m16:55:46[0m [93m[🔔 ALERT][0m ⚠️  Scam alert: the5ers - reddit_scam (high)
+2026-02-08 16:55:49 | [2m16:55:49[0m [96m[🔍 SCRAPE][0m Scraping r/FuturesTrading...
+2026-02-08 16:55:53 | [2m16:55:53[0m [96m[🔍 SCRAPE][0m Reddit: 75p 20m 0e
+2026-02-08 16:55:53 | [2m16:55:53[0m [96m[🔍 SCRAPE][0m Reddit: {'posts_found': 75, 'mentions': 20, 'scam_alerts': 1, 'errors': 0}
+2026-02-08 16:55:53 | [2m16:55:53[0m [96m[🔍 SCRAPE][0m Trustpilot scrape (10 firms)...
+2026-02-08 16:56:45 | [2m16:56:45[0m [96m[🔍 SCRAPE][0m Trustpilot: 0ok 10err
+2026-02-08 16:56:45 | [2m16:56:45[0m [96m[🔍 SCRAPE][0m Trustpilot: {'scraped': 0, 'score_drops': 0, 'low_scores': 0, 'errors': 10}
+2026-02-08 16:56:45 | [2m16:56:45[0m [93m[🔔 ALERT][0m Sending 17 alerts to premium (17 total pending)...
+2026-02-08 16:57:38 | [2m16:57:38[0m [93m[🔔 ALERT][0m Alerts sent ✓ (17/17)
+2026-02-08 16:57:38 | [2m16:57:38[0m [93m[🔔 ALERT][0m Alerts ✓
+2026-02-08 16:57:38 | [2m16:57:38[0m [96m[🔍 SCRAPE][0m ═══ Complete ═══
+2026-02-08 16:57:38 | [2m16:57:38[0m [96m[🔍 SCRAPE][0m Next in 3h...
+2026-02-08 16:58:00 | [2m16:58:00[0m [1m[96m[🤖 BOT][0m User started: 909302789 (@Ox00n4)
+2026-02-08 17:06:21 | [2m17:06:21[0m [1m[92m[🚀 STARTUP][0m Bot shutting down...
+2026-02-08 17:06:48 | [2m17:06:48[0m [1m[92m[🚀 STARTUP][0m Starting PropFirmTracker Bot...
+2026-02-08 17:06:48 | [2m17:06:48[0m [1m[92m[🚀 STARTUP][0m Setting up database...
+2026-02-08 17:06:48 | [2m17:06:48[0m [2m[97m[💾 DB][0m Initializing database...
+2026-02-08 17:06:48 | [2m17:06:48[0m [2m[97m[💾 DB][0m Database initialized successfully ✓
+2026-02-08 17:06:48 | [2m17:06:48[0m [1m[92m[🚀 STARTUP][0m Setting up Telegram bot...
+2026-02-08 17:06:48 | [2m17:06:48[0m [1m[92m[🚀 STARTUP][0m Creating bot...
+2026-02-08 17:06:48 | [2m17:06:48[0m [1m[92m[🚀 STARTUP][0m Handlers ✓
+2026-02-08 17:06:48 | [2m17:06:48[0m [1m[92m[🚀 STARTUP][0m Starting polling...
+2026-02-08 17:06:48 | [2m17:06:48[0m [1m[92m[🚀 STARTUP][0m Bot ready ✓ Admin: [909302789]
+2026-02-08 17:06:48 | [2m17:06:48[0m [1m[92m[🚀 STARTUP][0m Scheduler ✓
+2026-02-08 17:06:48 | [2m17:06:48[0m [1m[92m[🚀 STARTUP][0m ═══════════════════════════════════════
+2026-02-08 17:06:48 | [2m17:06:48[0m [1m[92m[🚀 STARTUP][0m 🚀 PropFirmTracker Bot is LIVE!
+2026-02-08 17:06:48 | [2m17:06:48[0m [1m[92m[🚀 STARTUP][0m ═══════════════════════════════════════
+2026-02-08 17:06:48 | [2m17:06:48[0m [1m[92m[🚀 STARTUP][0m Scheduler: every 3h
+2026-02-08 17:07:18 | [2m17:07:18[0m [96m[🔍 SCRAPE][0m ═══ Scrape 17:07:18 ═══
+2026-02-08 17:07:18 | [2m17:07:18[0m [96m[🔍 SCRAPE][0m Scraping 10 prop firms...
+2026-02-08 17:07:18 | [2m17:07:18[0m [96m[🔍 SCRAPE][0m Scraping FTMO...
+2026-02-08 17:07:18 | [2m17:07:18[0m [97m[📌 DIFF][0m Change detected: ftmo/pricing (hash changed)
+2026-02-08 17:07:18 | [2m17:07:18[0m [97m[📌 DIFF][0m Change recorded: ftmo - new_promo
+2026-02-08 17:07:18 | [2m17:07:18[0m [97m[📌 DIFF][0m 📝 🎟️ Promo/Sale Detected | FTMO — Pricing
+💰 Numbers changed: $3, 2% → $10,000,, $25,000,, $50,000,
+📋 '
+2026-02-08 17:07:19 | [2m17:07:19[0m [97m[📌 DIFF][0m Change detected: ftmo/rules (hash changed)
+2026-02-08 17:07:19 | [2m17:07:19[0m [97m[📌 DIFF][0m Change recorded: ftmo - new_promo
+2026-02-08 17:07:19 | [2m17:07:19[0m [97m[📌 DIFF][0m 📝 🎟️ Promo/Sale Detected | FTMO — Rules
+💰 Numbers changed: 6%, $8, $3 → 10%, $100,000, $10,000
+📋 'prof
+2026-02-08 17:07:21 | [2m17:07:21[0m [97m[📌 DIFF][0m Change detected: ftmo/homepage (hash changed)
+2026-02-08 17:07:21 | [2m17:07:21[0m [97m[📌 DIFF][0m Change recorded: ftmo - new_promo
+2026-02-08 17:07:21 | [2m17:07:21[0m [97m[📌 DIFF][0m 📝 🎟️ Promo/Sale Detected | FTMO — Homepage
+💰 Numbers changed: $8, 1%, 6% → 10%, 90%, $200,000
+📋 'max l
+2026-02-08 17:07:21 | [2m17:07:21[0m [93m[🔔 ALERT][0m New promo detected: ftmo - CUSTOMER (See website)
+2026-02-08 17:07:21 | [2m17:07:21[0m [96m[🔍 SCRAPE][0m 🎟️ Promo: ftmo — CUSTOMER ()
+2026-02-08 17:07:23 | [2m17:07:23[0m [97m[📌 DIFF][0m Change detected: ftmo/blog (hash changed)
+2026-02-08 17:07:23 | [2m17:07:23[0m [97m[📌 DIFF][0m Change recorded: ftmo - new_promo
+2026-02-08 17:07:23 | [2m17:07:23[0m [97m[📌 DIFF][0m 📝 🎟️ Promo/Sale Detected | FTMO — Blog
+💰 Numbers changed: $0 → $25,198, $200,000
+📋 'scaling' section u
+2026-02-08 17:07:26 | [2m17:07:26[0m [96m[🔍 SCRAPE][0m Scraping Funded Next...
+2026-02-08 17:07:32 | [2m17:07:32[0m [93m[🔔 ALERT][0m New promo detected: fundednext - TECHNOLOGY (See website)
+2026-02-08 17:07:32 | [2m17:07:32[0m [96m[🔍 SCRAPE][0m 🎟️ Promo: fundednext — TECHNOLOGY ()
+2026-02-08 17:07:40 | [2m17:07:40[0m [96m[🔍 SCRAPE][0m Scraping The 5%ers...
+2026-02-08 17:07:47 | [2m17:07:47[0m [96m[🔍 SCRAPE][0m Scraping MyFundedFX...
+2026-02-08 17:07:48 | [2m17:07:48[0m [97m[📌 DIFF][0m Change detected: myfundedfx/pricing (hash changed)
+2026-02-08 17:07:48 | [2m17:07:48[0m [97m[📌 DIFF][0m Change recorded: myfundedfx - new_promo
+2026-02-08 17:07:48 | [2m17:07:48[0m [97m[📌 DIFF][0m 📝 🎟️ Promo/Sale Detected | MyFundedFX — Pricing
+💰 Numbers changed: $,, $8 → $400,000, $56, $400
+📋 'lev
+2026-02-08 17:07:49 | [2m17:07:49[0m [97m[📌 DIFF][0m Change detected: myfundedfx/rules (hash changed)
+2026-02-08 17:07:49 | [2m17:07:49[0m [97m[📌 DIFF][0m Change recorded: myfundedfx - rules_change
+2026-02-08 17:07:49 | [2m17:07:49[0m [97m[📌 DIFF][0m 📝 📋 Rules Update | MyFundedFX — Rules
+📋 'scaling' section updated
+2026-02-08 17:07:50 | [2m17:07:50[0m [97m[📌 DIFF][0m Change detected: myfundedfx/homepage (hash changed)
+2026-02-08 17:07:50 | [2m17:07:50[0m [97m[📌 DIFF][0m Change recorded: myfundedfx - new_promo
+2026-02-08 17:07:50 | [2m17:07:50[0m [97m[📌 DIFF][0m 📝 🎟️ Promo/Sale Detected | MyFundedFX — Homepage
+💰 Numbers changed: 0%, $0, $3 → $400,000, $56, $400
+📋
+2026-02-08 17:07:52 | [2m17:07:52[0m [97m[📌 DIFF][0m Change detected: myfundedfx/blog (hash changed)
+2026-02-08 17:07:52 | [2m17:07:52[0m [97m[📌 DIFF][0m Change recorded: myfundedfx - rules_change
+2026-02-08 17:07:52 | [2m17:07:52[0m [97m[📌 DIFF][0m 📝 📋 Rules Update | MyFundedFX — Blog
+📋 'drawdown' section updated
+2026-02-08 17:07:55 | [2m17:07:55[0m [96m[🔍 SCRAPE][0m Scraping TopStep...
+2026-02-08 17:07:55 | [2m17:07:55[0m [97m[📌 DIFF][0m Change detected: topstep/pricing (hash changed)
+2026-02-08 17:07:55 | [2m17:07:55[0m [97m[📌 DIFF][0m Change recorded: topstep - new_promo
+2026-02-08 17:07:55 | [2m17:07:55[0m [97m[📌 DIFF][0m 📝 🎟️ Promo/Sale Detected | TopStep — Pricing
+📋 'drawdown' section updated
+2026-02-08 17:07:56 | [2m17:07:56[0m [97m[📌 DIFF][0m Change detected: topstep/rules (hash changed)
+2026-02-08 17:07:56 | [2m17:07:56[0m [97m[📌 DIFF][0m Change recorded: topstep - new_promo
+2026-02-08 17:07:56 | [2m17:07:56[0m [97m[📌 DIFF][0m 📝 🎟️ Promo/Sale Detected | TopStep — Rules
+➕ New: Trading Combine Sweepstakes Rules 2025 | Topstep
+➖ R
+2026-02-08 17:07:58 | [2m17:07:58[0m [97m[📌 DIFF][0m Change detected: topstep/homepage (hash changed)
+2026-02-08 17:07:58 | [2m17:07:58[0m [97m[📌 DIFF][0m Change recorded: topstep - new_promo
+2026-02-08 17:07:58 | [2m17:07:58[0m [97m[📌 DIFF][0m 📝 🎟️ Promo/Sale Detected | TopStep — Homepage
+💰 Numbers changed: 1% → $50, $138, $76
+📋 'drawdown' sect
+2026-02-08 17:08:00 | [2m17:08:00[0m [97m[📌 DIFF][0m Change detected: topstep/blog (hash changed)
+2026-02-08 17:08:00 | [2m17:08:00[0m [97m[📌 DIFF][0m Change recorded: topstep - pricing_change
+2026-02-08 17:08:00 | [2m17:08:00[0m [97m[📌 DIFF][0m 📝 💰 Pricing Update | TopStep — Blog
+➕ New: Trading Blogs, Podcasts, Ebooks, and More! | Topstep
+➖ Remo
+2026-02-08 17:08:03 | [2m17:08:03[0m [96m[🔍 SCRAPE][0m Scraping Apex Trader Funding...
+2026-02-08 17:08:05 | [2m17:08:05[0m [96m[🔍 SCRAPE][0m Scraping E8 Funding...
+2026-02-08 17:08:07 | [2m17:08:07[0m [96m[🔍 SCRAPE][0m Scraping Funding Pips...
+2026-02-08 17:08:07 | [2m17:08:07[0m [97m[📌 DIFF][0m Change detected: fundingpips/pricing (hash changed)
+2026-02-08 17:08:07 | [2m17:08:07[0m [97m[📌 DIFF][0m Change recorded: fundingpips - pricing_change
+2026-02-08 17:08:07 | [2m17:08:07[0m [97m[📌 DIFF][0m 📝 💰 Pricing Update | Funding Pips — Pricing
+➕ New: Best Prop Firm 2026 | Instant Funding & Funded Acco
+2026-02-08 17:08:09 | [2m17:08:09[0m [97m[📌 DIFF][0m Change detected: fundingpips/homepage (hash changed)
+2026-02-08 17:08:09 | [2m17:08:09[0m [97m[📌 DIFF][0m Change recorded: fundingpips - content_update
+2026-02-08 17:08:09 | [2m17:08:09[0m [97m[📌 DIFF][0m 📝 🔄 Content Update | Funding Pips — Homepage
+➕ New: Best Prop Firm 2026 | Instant Funding & Funded Acc
+2026-02-08 17:08:10 | [2m17:08:10[0m [97m[📌 DIFF][0m Change detected: fundingpips/blog (hash changed)
+2026-02-08 17:08:10 | [2m17:08:10[0m [97m[📌 DIFF][0m Change recorded: fundingpips - pricing_change
+2026-02-08 17:08:10 | [2m17:08:10[0m [97m[📌 DIFF][0m 📝 💰 Pricing Update | Funding Pips — Blog
+➕ New: FundingPips Blog - Trading Insights & Market Updates
+➖
+2026-02-08 17:08:13 | [2m17:08:13[0m [96m[🔍 SCRAPE][0m Scraping Goat Funded Trader...
+2026-02-08 17:08:14 | [2m17:08:14[0m [93m[🔔 ALERT][0m New promo detected: goatfunded - TECHNOLOGY (35% OFF)
+2026-02-08 17:08:14 | [2m17:08:14[0m [96m[🔍 SCRAPE][0m 🎟️ Promo: goatfunded — TECHNOLOGY (35% OFF)
+2026-02-08 17:08:14 | [2m17:08:14[0m [93m[🔔 ALERT][0m New promo detected: goatfunded - FIRSTGFT (35% OFF)
+2026-02-08 17:08:14 | [2m17:08:14[0m [96m[🔍 SCRAPE][0m 🎟️ Promo: goatfunded — FIRSTGFT (35% OFF)
+2026-02-08 17:08:18 | [2m17:08:18[0m [96m[🔍 SCRAPE][0m Scraping Blueberry Funded...
+2026-02-08 17:08:19 | [2m17:08:19[0m [97m[📌 DIFF][0m Change detected: blueberry_funded/pricing (hash changed)
+2026-02-08 17:08:19 | [2m17:08:19[0m [97m[📌 DIFF][0m Change recorded: blueberry_funded - new_promo
+2026-02-08 17:08:19 | [2m17:08:19[0m [97m[📌 DIFF][0m 📝 🎟️ Promo/Sale Detected | Blueberry Funded — Pricing
+📋 'drawdown' section updated
+2026-02-08 17:08:19 | [2m17:08:19[0m [93m[🔔 ALERT][0m New promo detected: blueberry_funded - BERRY15 (15% OFF)
+2026-02-08 17:08:19 | [2m17:08:19[0m [96m[🔍 SCRAPE][0m 🎟️ Promo: blueberry_funded — BERRY15 (15% OFF)
+2026-02-08 17:08:20 | [2m17:08:20[0m [97m[📌 DIFF][0m Change detected: blueberry_funded/homepage (hash changed)
+2026-02-08 17:08:20 | [2m17:08:20[0m [97m[📌 DIFF][0m Change recorded: blueberry_funded - new_promo
+2026-02-08 17:08:20 | [2m17:08:20[0m [97m[📌 DIFF][0m 📝 🎟️ Promo/Sale Detected | Blueberry Funded — Homepage
+📋 'drawdown' section updated
+2026-02-08 17:08:23 | [2m17:08:23[0m [96m[🔍 SCRAPE][0m Scrape complete — Pages: 27 | Changes: 17 | Promos: 5 | Errors: 0
+2026-02-08 17:08:23 | [2m17:08:23[0m [96m[🔍 SCRAPE][0m Prop firms: {'scraped': 27, 'changes': 17, 'errors': 0, 'promos': 5}
+2026-02-08 17:08:23 | [2m17:08:23[0m [96m[🔍 SCRAPE][0m Reddit RSS (4 subs)...
+2026-02-08 17:08:23 | [2m17:08:23[0m [96m[🔍 SCRAPE][0m Scraping r/FundedTrading...
+2026-02-08 17:08:29 | [2m17:08:29[0m [96m[🔍 SCRAPE][0m Scraping r/proptrading...
+2026-02-08 17:08:34 | [2m17:08:34[0m [96m[🔍 SCRAPE][0m Scraping r/Forex...
+2026-02-08 17:08:35 | [2m17:08:35[0m [93m[🔔 ALERT][0m ⚠️  Scam alert: the5ers - reddit_scam (high)
+2026-02-08 17:08:39 | [2m17:08:39[0m [96m[🔍 SCRAPE][0m Scraping r/FuturesTrading...
+2026-02-08 17:08:42 | [2m17:08:42[0m [96m[🔍 SCRAPE][0m Reddit: 75p 20m 0e
+2026-02-08 17:08:42 | [2m17:08:42[0m [96m[🔍 SCRAPE][0m Reddit: {'posts_found': 75, 'mentions': 20, 'scam_alerts': 1, 'errors': 0}
+2026-02-08 17:08:42 | [2m17:08:42[0m [96m[🔍 SCRAPE][0m Trustpilot scrape (10 firms)...
+2026-02-08 17:09:27 | [2m17:09:27[0m [96m[🔍 SCRAPE][0m Trustpilot: 0ok 10err
+2026-02-08 17:09:27 | [2m17:09:27[0m [96m[🔍 SCRAPE][0m Trustpilot: {'scraped': 0, 'score_drops': 0, 'low_scores': 0, 'errors': 10}
+2026-02-08 17:09:27 | [2m17:09:27[0m [93m[🔔 ALERT][0m Sending 15 VIP alerts (17 pending)...
+2026-02-08 17:09:42 | [2m17:09:42[0m [93m[🔔 ALERT][0m VIP alerts: 4 messages sent ✓
+2026-02-08 17:09:42 | [2m17:09:42[0m [93m[🔔 ALERT][0m Alerts ✓
+2026-02-08 17:09:42 | [2m17:09:42[0m [96m[🔍 SCRAPE][0m ═══ Complete ═══
+2026-02-08 17:09:42 | [2m17:09:42[0m [96m[🔍 SCRAPE][0m Next in 3h...
+2026-02-08 17:10:55 | [2m17:10:55[0m [1m[92m[🚀 STARTUP][0m Bot shutting down...
+2026-02-08 17:14:17 | [2m17:14:17[0m [1m[92m[🚀 STARTUP][0m Starting PropFirmTracker Bot...
+2026-02-08 17:14:17 | [2m17:14:17[0m [1m[92m[🚀 STARTUP][0m Setting up database...
+2026-02-08 17:14:17 | [2m17:14:17[0m [2m[97m[💾 DB][0m Initializing database...
+2026-02-08 17:14:17 | [2m17:14:17[0m [2m[97m[💾 DB][0m Database initialized successfully ✓
+2026-02-08 17:14:17 | [2m17:14:17[0m [1m[92m[🚀 STARTUP][0m Setting up Telegram bot...
+2026-02-08 17:14:17 | [2m17:14:17[0m [1m[92m[🚀 STARTUP][0m Creating bot...
+2026-02-08 17:14:18 | [2m17:14:18[0m [1m[92m[🚀 STARTUP][0m Handlers ✓
+2026-02-08 17:14:18 | [2m17:14:18[0m [1m[92m[🚀 STARTUP][0m Starting polling...
+2026-02-08 17:14:18 | [2m17:14:18[0m [1m[92m[🚀 STARTUP][0m Bot ready ✓ Admin: [909302789]
+2026-02-08 17:14:18 | [2m17:14:18[0m [1m[92m[🚀 STARTUP][0m Scheduler ✓
+2026-02-08 17:14:18 | [2m17:14:18[0m [1m[92m[🚀 STARTUP][0m ═══════════════════════════════════════
+2026-02-08 17:14:18 | [2m17:14:18[0m [1m[92m[🚀 STARTUP][0m 🚀 PropFirmTracker Bot is LIVE!
+2026-02-08 17:14:18 | [2m17:14:18[0m [1m[92m[🚀 STARTUP][0m ═══════════════════════════════════════
+2026-02-08 17:14:18 | [2m17:14:18[0m [1m[92m[🚀 STARTUP][0m Scheduler: every 3h
+2026-02-08 17:14:48 | [2m17:14:48[0m [96m[🔍 SCRAPE][0m ═══ Scrape 17:14:48 ═══
+2026-02-08 17:14:48 | [2m17:14:48[0m [96m[🔍 SCRAPE][0m Scraping 10 firms...
+2026-02-08 17:14:48 | [2m17:14:48[0m [96m[🔍 SCRAPE][0m Scraping FTMO...
+2026-02-08 17:14:54 | [2m17:14:54[0m [96m[🔍 SCRAPE][0m Scraping Funded Next...
+2026-02-08 17:15:10 | [2m17:15:10[0m [96m[🔍 SCRAPE][0m Scraping The 5%ers...
+2026-02-08 17:15:17 | [2m17:15:17[0m [96m[🔍 SCRAPE][0m Scraping MyFundedFX...
+2026-02-08 17:15:24 | [2m17:15:24[0m [96m[🔍 SCRAPE][0m Scraping TopStep...
+2026-02-08 17:15:29 | [2m17:15:29[0m [97m[📌 DIFF][0m Change detected: topstep/blog (hash changed)
+2026-02-08 17:15:29 | [2m17:15:29[0m [97m[📌 DIFF][0m Change recorded: topstep - content_update
+2026-02-08 17:15:29 | [2m17:15:29[0m [97m[📌 DIFF][0m 📝 TopStep/blog: content_update
+2026-02-08 17:15:32 | [2m17:15:32[0m [96m[🔍 SCRAPE][0m Scraping Apex Trader Funding...
+2026-02-08 17:15:34 | [2m17:15:34[0m [96m[🔍 SCRAPE][0m Scraping E8 Funding...
+2026-02-08 17:15:36 | [2m17:15:36[0m [96m[🔍 SCRAPE][0m Scraping Funding Pips...
+2026-02-08 17:15:43 | [2m17:15:43[0m [96m[🔍 SCRAPE][0m Scraping Goat Funded Trader...
+2026-02-08 17:15:48 | [2m17:15:48[0m [96m[🔍 SCRAPE][0m Scraping Blueberry Funded...
+2026-02-08 17:15:53 | [2m17:15:53[0m [96m[🔍 SCRAPE][0m Scrape: 27p 1c 0p 0e
+2026-02-08 17:15:53 | [2m17:15:53[0m [96m[🔍 SCRAPE][0m Prop firms: {'scraped': 27, 'changes': 1, 'errors': 0, 'promos': 0}
+2026-02-08 17:15:53 | [2m17:15:53[0m [96m[🔍 SCRAPE][0m Reddit RSS (4 subs)...
+2026-02-08 17:15:53 | [2m17:15:53[0m [96m[🔍 SCRAPE][0m Scraping r/FundedTrading...
+2026-02-08 17:15:57 | [2m17:15:57[0m [96m[🔍 SCRAPE][0m Scraping r/proptrading...
+2026-02-08 17:16:02 | [2m17:16:02[0m [96m[🔍 SCRAPE][0m Scraping r/Forex...
+2026-02-08 17:16:03 | [2m17:16:03[0m [93m[🔔 ALERT][0m ⚠️  Scam alert: the5ers - reddit_scam (high)
+2026-02-08 17:16:08 | [2m17:16:08[0m [96m[🔍 SCRAPE][0m Scraping r/FuturesTrading...
+2026-02-08 17:16:12 | [2m17:16:12[0m [96m[🔍 SCRAPE][0m Reddit: 75p 20m 0e
+2026-02-08 17:16:12 | [2m17:16:12[0m [96m[🔍 SCRAPE][0m Reddit: {'posts_found': 75, 'mentions': 20, 'scam_alerts': 1, 'errors': 0}
+2026-02-08 17:16:12 | [2m17:16:12[0m [96m[🔍 SCRAPE][0m Trustpilot (10 firms)...
+2026-02-08 17:16:15 | [2m17:16:15[0m [96m[🔍 SCRAPE][0m ✅ FTMO: ⭐4.8/5 (38209) via HTML
+2026-02-08 17:16:20 | [2m17:16:20[0m [96m[🔍 SCRAPE][0m ✅ Funded Next: ⭐4.5/5 (57727) via HTML
+2026-02-08 17:16:26 | [2m17:16:26[0m [96m[🔍 SCRAPE][0m ✅ The 5%ers: ⭐4.8/5 (20580) via HTML
+2026-02-08 17:16:32 | [2m17:16:32[0m [96m[🔍 SCRAPE][0m ✅ MyFundedFX: ⭐4.3/5 (2883) via HTML
+2026-02-08 17:16:39 | [2m17:16:39[0m [96m[🔍 SCRAPE][0m ✅ TopStep: ⭐3.5/5 (13394) via HTML
+2026-02-08 17:16:46 | [2m17:16:46[0m [96m[🔍 SCRAPE][0m ✅ Apex Trader Funding: ⭐4.4/5 (17079) via HTML
+2026-02-08 17:16:51 | [2m17:16:51[0m [96m[🔍 SCRAPE][0m ✅ E8 Funding: ⭐4.4/5 (3097) via HTML
+2026-02-08 17:16:59 | [2m17:16:59[0m [96m[🔍 SCRAPE][0m ✅ Funding Pips: ⭐4.5/5 (45066) via HTML
+2026-02-08 17:17:05 | [2m17:17:05[0m [96m[🔍 SCRAPE][0m ✅ Goat Funded Trader: ⭐3.3/5 (3533) via HTML
+2026-02-08 17:17:11 | [2m17:17:11[0m [96m[🔍 SCRAPE][0m ✅ Blueberry Funded: ⭐3.6/5 (1550) via HTML
+2026-02-08 17:17:13 | [2m17:17:13[0m [96m[🔍 SCRAPE][0m Trustpilot: 10ok 0err
+2026-02-08 17:17:13 | [2m17:17:13[0m [96m[🔍 SCRAPE][0m Trustpilot: {'scraped': 10, 'score_drops': 0, 'low_scores': 0, 'errors': 0}
+2026-02-08 17:17:13 | [2m17:17:13[0m [93m[🔔 ALERT][0m Sending 1 VIP alerts (1 pending)...
+2026-02-08 17:17:17 | [2m17:17:17[0m [93m[🔔 ALERT][0m VIP alerts: 1 messages sent ✓
+2026-02-08 17:17:17 | [2m17:17:17[0m [93m[🔔 ALERT][0m Alerts ✓
+2026-02-08 17:17:17 | [2m17:17:17[0m [96m[🔍 SCRAPE][0m ═══ Complete ═══
+2026-02-08 17:17:17 | [2m17:17:17[0m [96m[🔍 SCRAPE][0m Next in 3h...
+2026-02-08 17:17:42 | [2m17:17:42[0m [1m[96m[🤖 BOT][0m User started: 909302789 (@Ox00n4)
+2026-02-08 17:18:54 | [2m17:18:54[0m [1m[96m[🤖 BOT][0m User started: 909302789 (@Ox00n4)
+2026-02-08 17:19:18 | [2m17:19:18[0m [1m[92m[🚀 STARTUP][0m Bot shutting down...

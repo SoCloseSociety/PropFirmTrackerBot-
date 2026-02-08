@@ -1,0 +1,131 @@
+"""Trustpilot Scraper V3 — enhanced browser fingerprint"""
+import re, time, random, json, requests
+from bs4 import BeautifulSoup
+from utils.logger import log_info, log_error, log_warn
+from database import save_trustpilot_score, get_latest_trustpilot_scores, save_scam_alert
+from config import PROP_FIRMS, REQUEST_TIMEOUT
+
+class TrustpilotScraper:
+    SCORE_DROP = 0.3
+    LOW_SCORE = 2.5
+
+    UAS = [
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+    ]
+
+    def __init__(self):
+        self.session = requests.Session()
+        self.results = {"scraped":0, "score_drops":0, "low_scores":0, "errors":0}
+
+    def _headers(self):
+        ua = random.choice(self.UAS)
+        return {
+            "User-Agent": ua,
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+            "Accept-Language": "en-US,en;q=0.9",
+            "Accept-Encoding": "gzip, deflate, br",
+            "Cache-Control": "no-cache",
+            "Pragma": "no-cache",
+            "Sec-Ch-Ua": '"Chromium";v="131", "Not_A Brand";v="24"',
+            "Sec-Ch-Ua-Mobile": "?0",
+            "Sec-Ch-Ua-Platform": '"Windows"',
+            "Sec-Fetch-Dest": "document",
+            "Sec-Fetch-Mode": "navigate",
+            "Sec-Fetch-Site": "none",
+            "Sec-Fetch-User": "?1",
+            "Upgrade-Insecure-Requests": "1",
+            "Referer": "https://www.google.com/",
+            "DNT": "1",
+        }
+
+    def _scrape_page(self, url):
+        try:
+            resp = self.session.get(url, headers=self._headers(), timeout=REQUEST_TIMEOUT, allow_redirects=True)
+
+            if resp.status_code == 403:
+                log_warn(f"Trustpilot 403: {url} (anti-bot)", tag="SCRAPE")
+                return None, None
+            if resp.status_code == 429:
+                log_warn(f"Trustpilot 429: rate limited", tag="SCRAPE")
+                return None, None
+            if resp.status_code != 200:
+                log_warn(f"Trustpilot {resp.status_code}: {url}", tag="SCRAPE")
+                return None, None
+
+            soup = BeautifulSoup(resp.text, 'html.parser')
+            score, count = None, None
+
+            # Method 1: JSON-LD
+            for script in soup.find_all('script', type='application/ld+json'):
+                try:
+                    data = json.loads(script.string)
+                    items = data if isinstance(data, list) else [data]
+                    for item in items:
+                        if isinstance(item, dict) and 'aggregateRating' in item:
+                            r = item['aggregateRating']
+                            score = float(r.get('ratingValue', 0))
+                            count = int(r.get('reviewCount', 0))
+                            break
+                    if score: break
+                except: continue
+
+            # Method 2: data attributes
+            if score is None:
+                el = soup.select_one('[data-rating]')
+                if el: score = float(el.get('data-rating', 0))
+                el2 = soup.select_one('[data-reviews-count-typography]')
+                if el2:
+                    m = re.search(r'([\d,]+)', el2.get_text())
+                    if m: count = int(m.group(1).replace(',',''))
+
+            # Method 3: text parsing
+            if score is None:
+                text = soup.get_text()
+                m = re.search(r'TrustScore\s+(\d+\.?\d*)', text)
+                if m: score = float(m.group(1))
+                m2 = re.search(r'([\d,]+)\s+reviews?', text, re.I)
+                if m2: count = int(m2.group(1).replace(',',''))
+
+            return score, count
+
+        except requests.exceptions.Timeout:
+            log_warn(f"Trustpilot timeout: {url}", tag="SCRAPE")
+            return None, None
+        except Exception as e:
+            log_error(f"Trustpilot {url}: {e}", tag="SCRAPE")
+            return None, None
+
+    def scrape_firm(self, slug, cfg):
+        tp_url = cfg.get("trustpilot")
+        if not tp_url: return
+        score, count = self._scrape_page(tp_url)
+        if score is not None:
+            self.results["scraped"] += 1
+            save_trustpilot_score(slug, score, count or 0)
+            log_info(f"Trustpilot {cfg['name']}: ⭐{score}/5 ({count or '?'})", tag="SCRAPE")
+            self._check_alerts(slug, cfg['name'], score, count)
+        else:
+            self.results["errors"] += 1
+
+    def _check_alerts(self, slug, name, score, count):
+        prev = get_latest_trustpilot_scores().get(slug)
+        if prev and prev.get('score'):
+            if score < prev['score'] - self.SCORE_DROP:
+                self.results["score_drops"] += 1
+                save_scam_alert(slug, "trustpilot_drop", "medium",
+                    f"{name}: {prev['score']:.1f} → {score:.1f}", "Trustpilot")
+                log_info(f"📉 {name}: {prev['score']:.1f}→{score:.1f}", tag="ALERT")
+        if score < self.LOW_SCORE:
+            self.results["low_scores"] += 1
+
+    def scrape_all(self):
+        log_info(f"Trustpilot scrape ({len(PROP_FIRMS)} firms)...", tag="SCRAPE")
+        self.results = {"scraped":0,"score_drops":0,"low_scores":0,"errors":0}
+        for slug, cfg in PROP_FIRMS.items():
+            try: self.scrape_firm(slug, cfg)
+            except Exception as e: log_error(f"TP {slug}: {e}", tag="SCRAPE"); self.results["errors"]+=1
+            time.sleep(random.uniform(3, 7))
+        log_info(f"Trustpilot: {self.results['scraped']}ok {self.results['errors']}err", tag="SCRAPE")
+        return self.results

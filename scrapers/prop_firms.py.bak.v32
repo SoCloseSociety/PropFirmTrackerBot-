@@ -1,0 +1,308 @@
+"""
+PropFirmTracker — Prop Firm Scraper V3.1
+Smart diff: compares old vs new content, extracts actual changes.
+"""
+import hashlib, re, time, requests, difflib
+from bs4 import BeautifulSoup
+from utils.logger import log_info, log_error, log_debug, log_warn
+from database import save_firm_snapshot, save_change, save_promo, get_connection
+from config import USER_AGENT, REQUEST_TIMEOUT, PROP_FIRMS
+
+
+class PropFirmScraper:
+
+    # Keywords that indicate important changes for traders
+    PRICING_KEYWORDS = [
+        r'\$[\d,]+(?:\.\d{2})?', r'€[\d,]+', r'£[\d,]+',
+        r'\d+%\s*(?:off|discount|profit\s*split|drawdown|target)',
+        r'(?:price|cost|fee)[s]?\s*[:=]?\s*\$?[\d,]+',
+    ]
+    RULES_KEYWORDS = [
+        'drawdown', 'profit target', 'profit split', 'max loss', 'daily loss',
+        'trailing', 'leverage', 'lot size', 'minimum trading days', 'payout',
+        'scaling', 'max allocation', 'news trading', 'weekend holding',
+        'ea allowed', 'copy trading', 'consistency rule',
+    ]
+    PROMO_SIGNALS = [
+        'promo', 'discount', 'coupon', 'sale', 'offer', 'deal', 'special',
+        'limited time', 'flash sale', 'black friday', 'new year', 'holiday',
+        'save', '% off', 'bogo', 'buy one', 'free trial', 'bonus',
+    ]
+
+    def __init__(self):
+        self.session = requests.Session()
+        self.session.headers.update({
+            "User-Agent": USER_AGENT,
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept-Language": "en-US,en;q=0.9",
+        })
+        self.results = {"scraped": 0, "changes": 0, "errors": 0, "promos": 0}
+
+    def _fetch_page(self, url):
+        try:
+            resp = self.session.get(url, timeout=REQUEST_TIMEOUT)
+            resp.raise_for_status()
+            soup = BeautifulSoup(resp.text, 'html.parser')
+            for tag in soup(['script', 'style', 'nav', 'footer', 'header', 'iframe', 'noscript']):
+                tag.decompose()
+            text = soup.get_text(separator='\n', strip=True)
+            text = re.sub(r'\n{3,}', '\n\n', text)
+            text = re.sub(r' {2,}', ' ', text)
+            return soup, text
+        except requests.RequestException as e:
+            log_error(f"Fetch failed {url}: {e}", tag="SCRAPE")
+            return None, None
+
+    def _hash(self, text):
+        if not text: return None
+        norm = re.sub(r'\s+', ' ', text.strip().lower())
+        return hashlib.md5(norm.encode()).hexdigest() if norm else None
+
+    def _get_old_content(self, firm_slug, page_type):
+        """Get previously stored content for comparison."""
+        try:
+            conn = get_connection()
+            row = conn.execute(
+                "SELECT content, content_hash FROM firm_snapshots WHERE firm_slug=? AND page_type=?",
+                (firm_slug, page_type)
+            ).fetchone()
+            conn.close()
+            if row: return row['content'], row['content_hash']
+        except: pass
+        return None, None
+
+    def _smart_diff(self, old_text, new_text, firm_name, page_type):
+        """Compare old vs new content and generate meaningful summary."""
+        if not old_text or not new_text:
+            return self._analyze_content(new_text, firm_name, page_type), "content_update"
+
+        old_lines = [l.strip() for l in old_text.split('\n') if l.strip()]
+        new_lines = [l.strip() for l in new_text.split('\n') if l.strip()]
+
+        # Find added and removed lines
+        differ = difflib.unified_diff(old_lines, new_lines, lineterm='')
+        added, removed = [], []
+        for line in differ:
+            if line.startswith('+') and not line.startswith('+++'):
+                clean = line[1:].strip()
+                if len(clean) > 3: added.append(clean)
+            elif line.startswith('-') and not line.startswith('---'):
+                clean = line[1:].strip()
+                if len(clean) > 3: removed.append(clean)
+
+        if not added and not removed:
+            return f"{firm_name} {page_type}: minor formatting changes detected", "content_update"
+
+        # Categorize the change
+        change_type = self._categorize_change(added, removed, page_type)
+
+        # Build smart summary
+        summary = self._build_summary(firm_name, page_type, change_type, added, removed)
+        return summary, change_type
+
+    def _categorize_change(self, added, removed, page_type):
+        """Determine what type of change this is."""
+        all_text = ' '.join(added + removed).lower()
+
+        # Check for pricing changes
+        has_prices = bool(re.search(r'\$[\d,]+|\d+%\s*(?:off|discount)', all_text))
+        has_rules = any(kw in all_text for kw in self.RULES_KEYWORDS)
+        has_promo = any(kw in all_text for kw in self.PROMO_SIGNALS)
+
+        if page_type == "pricing" or has_prices:
+            if has_promo: return "new_promo"
+            return "pricing_change"
+        if page_type == "rules" or has_rules:
+            return "rules_change"
+        if has_promo:
+            return "new_promo"
+        return "content_update"
+
+    def _build_summary(self, firm_name, page_type, change_type, added, removed):
+        """Build a trader-useful summary of changes."""
+        parts = [f"{firm_name} — {page_type.title()}"]
+
+        # Extract key changes
+        changes_found = []
+
+        # Look for price changes
+        old_prices = self._extract_numbers(removed)
+        new_prices = self._extract_numbers(added)
+        if old_prices and new_prices:
+            changes_found.append(f"💰 Numbers changed: {', '.join(old_prices[:3])} → {', '.join(new_prices[:3])}")
+
+        # Look for rule keywords
+        for kw in self.RULES_KEYWORDS:
+            in_added = any(kw in a.lower() for a in added)
+            in_removed = any(kw in r.lower() for r in removed)
+            if in_added or in_removed:
+                changes_found.append(f"📋 '{kw}' section updated")
+                break  # Only first rule match
+
+        # Show top added/removed content
+        if not changes_found:
+            if added:
+                top_added = [a for a in added if len(a) > 10][:2]
+                if top_added:
+                    changes_found.append(f"➕ New: {top_added[0][:80]}")
+            if removed:
+                top_removed = [r for r in removed if len(r) > 10][:2]
+                if top_removed:
+                    changes_found.append(f"➖ Removed: {top_removed[0][:80]}")
+
+        if changes_found:
+            parts.append("\n".join(changes_found))
+        else:
+            parts.append(f"{len(added)} lines added, {len(removed)} removed")
+
+        # Type label
+        type_labels = {
+            "pricing_change": "💰 Pricing Update",
+            "rules_change": "📋 Rules Update",
+            "new_promo": "🎟️ Promo/Sale Detected",
+            "content_update": "🔄 Content Update",
+        }
+        parts.insert(0, type_labels.get(change_type, "🔄 Update"))
+
+        return " | ".join(parts[:2]) + ("\n" + "\n".join(parts[2:]) if len(parts) > 2 else "")
+
+    def _extract_numbers(self, lines):
+        """Extract prices and percentages from text lines."""
+        numbers = []
+        for line in lines:
+            prices = re.findall(r'\$[\d,]+(?:\.\d{2})?', line)
+            pcts = re.findall(r'\d+(?:\.\d+)?%', line)
+            numbers.extend(prices)
+            numbers.extend(pcts)
+        return list(dict.fromkeys(numbers))[:5]  # Unique, max 5
+
+    def _analyze_content(self, text, firm_name, page_type):
+        """Analyze new content when no old content exists (first scrape)."""
+        if not text: return f"{firm_name} {page_type}: initial snapshot saved"
+
+        # Extract interesting data points
+        prices = re.findall(r'\$[\d,]+(?:\.\d{2})?', text)
+        pcts = re.findall(r'\d+(?:\.\d+)?%', text)
+
+        info = f"{firm_name} {page_type}: initial scan"
+        if prices: info += f" | Prices found: {', '.join(prices[:5])}"
+        if pcts: info += f" | Percentages: {', '.join(pcts[:5])}"
+        return info
+
+    def _extract_promos(self, soup, text, firm_slug, url):
+        """Extract promo codes with improved detection."""
+        if not text: return
+
+        # Promo code patterns
+        code_patterns = [
+            r'(?:code|coupon|promo)[:\s]+["\']?([A-Z0-9]{4,20})["\']?',
+            r'(?:use|enter|apply)\s+(?:code\s+)?["\']?([A-Z][A-Z0-9]{3,19})["\']?',
+            r'([A-Z][A-Z0-9]{3,14})\s+(?:for|to\s+get|gives?\s+you)\s+(\d+%?\s*(?:off|discount))',
+            r'(?:discount\s+code|voucher)[:\s]+["\']?([A-Z0-9]{4,20})["\']?',
+            # Specific patterns for prop firms
+            r'(?:BOGO|SAVE|SALE|DEAL|BLACK|GET|NEW|VIP)[A-Z0-9]{1,15}',
+        ]
+
+        # Common false positives
+        blacklist = {
+            'HTTP','HTML','HTTPS','TRUE','FALSE','NULL','NONE','CODE','PROMO',
+            'ENTER','APPLY','COUPON','FREE','PLEASE','CLICK','HERE','YOUR',
+            'THIS','THAT','WITH','FROM','HAVE','WILL','JUST','MORE','ALSO',
+            'SOME','THAN','THEM','THEN','WHEN','ABOUT','BACK','BEEN','COME',
+            'EACH','EVEN','FIRST','GOOD','HIGH','INTO','KEEP','LAST','LONG',
+            'MADE','MAKE','MANY','MUCH','MUST','NAME','NEXT','ONLY','OVER',
+            'PART','SAME','TAKE','TELL','VERY','WANT','WELL','WORK',
+            'YEAR','USED','USING','REVIEW','REVIEWS','TRADE','TRADER','TRADING',
+            'ACCOUNT','FUNDED','FUNDING','PROFIT','TARGET','SPLIT','RULES',
+            'CHALLENGE','EVALUATION','PHASE','STEP','DAILY','TOTAL','LOSS',
+            'PAYOUT','PAYOUTS','WITHDRAWAL','PROP','FIRM','TEST','DEMO',
+        }
+
+        found_codes = set()
+        for pattern in code_patterns:
+            for m in re.finditer(pattern, text, re.IGNORECASE):
+                code = m.group(1).upper() if m.lastindex else m.group(0).upper()
+                has_digit = any(c.isdigit() for c in code)
+                if len(code) >= 4 and code not in blacklist and (has_digit or len(code) >= 8):
+                    found_codes.add(code)
+
+        # Extract discount context
+        discount_patterns = [
+            r'(\d+%\s*off)', r'(\d+%\s*discount)', r'(save\s*\d+%)',
+            r'(\$\d+\s*off)', r'(buy\s*\d+\s*get\s*\d+)', r'(\d+%\s*sale)',
+        ]
+        discount = ""
+        for p in discount_patterns:
+            m = re.search(p, text, re.IGNORECASE)
+            if m: discount = m.group(1).upper(); break
+
+        for code in found_codes:
+            saved = save_promo(
+                firm_slug=firm_slug, promo_code=code,
+                discount=discount or "See website",
+                description=f"Found on {firm_slug} {url.split('/')[-2] if '/' in url else 'website'}",
+                source_url=url
+            )
+            if saved:
+                self.results["promos"] += 1
+                log_info(f"🎟️ Promo: {firm_slug} — {code} ({discount})", tag="SCRAPE")
+
+    def scrape_firm(self, firm_slug, firm_config):
+        log_info(f"Scraping {firm_config['name']}...", tag="SCRAPE")
+        pages = {
+            "pricing": firm_config.get("pricing_url"),
+            "rules": firm_config.get("rules_url"),
+            "homepage": firm_config.get("url"),
+            "blog": firm_config.get("blog_url"),
+        }
+
+        for page_type, url in pages.items():
+            if not url: continue
+            soup, text = self._fetch_page(url)
+            if not text: self.results["errors"] += 1; continue
+            self.results["scraped"] += 1
+
+            new_hash = self._hash(text)
+
+            # Get OLD content BEFORE saving new
+            old_content, old_hash = self._get_old_content(firm_slug, page_type)
+
+            # Save new snapshot
+            changed = save_firm_snapshot(firm_slug, page_type, new_hash, text[:5000])
+
+            if changed and old_hash and old_hash != new_hash:
+                # REAL CHANGE — generate smart diff
+                summary, change_type = self._smart_diff(
+                    old_content, text[:5000], firm_config['name'], page_type
+                )
+                self.results["changes"] += 1
+                save_change(
+                    firm_slug=firm_slug, page_type=page_type,
+                    change_type=change_type, old_hash=old_hash,
+                    new_hash=new_hash, summary=summary
+                )
+                log_info(f"📝 {summary[:100]}", tag="DIFF")
+            elif changed and not old_hash:
+                # First time — just save initial snapshot
+                summary = self._analyze_content(text[:3000], firm_config['name'], page_type)
+                save_change(
+                    firm_slug=firm_slug, page_type=page_type,
+                    change_type="content_update", old_hash=None,
+                    new_hash=new_hash, summary=summary
+                )
+
+            # Check for promos on pricing and homepage
+            if page_type in ("pricing", "homepage"):
+                self._extract_promos(soup, text, firm_slug, url)
+
+            time.sleep(1)
+
+    def scrape_all(self):
+        log_info(f"Scraping {len(PROP_FIRMS)} prop firms...", tag="SCRAPE")
+        self.results = {"scraped": 0, "changes": 0, "errors": 0, "promos": 0}
+        for slug, cfg in PROP_FIRMS.items():
+            try: self.scrape_firm(slug, cfg)
+            except Exception as e: log_error(f"{slug}: {e}", tag="SCRAPE"); self.results["errors"] += 1
+            time.sleep(2)
+        log_info(f"Scrape complete — Pages: {self.results['scraped']} | Changes: {self.results['changes']} | Promos: {self.results['promos']} | Errors: {self.results['errors']}", tag="SCRAPE")
+        return self.results

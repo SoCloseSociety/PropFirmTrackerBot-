@@ -8,7 +8,7 @@ load_dotenv()
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "YOUR_BOT_TOKEN_HERE")
 FREE_CHANNEL_ID = os.getenv("FREE_CHANNEL_ID", "")
 PREMIUM_CHANNEL_ID = os.getenv("PREMIUM_CHANNEL_ID", "")
-ADMIN_USER_IDS = [int(x.strip()) for x in os.getenv("ADMIN_USER_IDS", "123456789").split(",") if x.strip()]
+ADMIN_USER_IDS = [int(x) for x in os.getenv("ADMIN_USER_IDS", "123456789").split(",")]
 
 PREMIUM_PRICE_MONTHLY = 14.99
 PREMIUM_PRICE_YEARLY = 119.99

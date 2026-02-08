@@ -1,0 +1,127 @@
+"""Alert Service V3 — handles Telegram flood control properly"""
+import asyncio
+from datetime import datetime, timedelta
+from telegram.error import RetryAfter, BadRequest, Forbidden
+from utils.logger import log_info, log_error, log_warn
+from database import get_unalerted_changes, mark_change_alerted, get_active_promos
+from config import FREE_CHANNEL_ID, PREMIUM_CHANNEL_ID, FREE_ALERT_DELAY_HOURS, PROP_FIRMS
+
+class AlertService:
+    # Max alerts per cycle to avoid mega-spam
+    MAX_ALERTS_PER_CYCLE = 20
+    # Delay between messages (seconds)
+    MSG_DELAY = 3
+
+    def __init__(self, bot_app):
+        self.bot = bot_app.bot if bot_app else None
+        self._disabled_channels = set()
+
+    def set_bot(self, bot): self.bot = bot
+
+    def _firm_name(self, slug): return PROP_FIRMS.get(slug, {}).get('name', slug.replace('_',' ').title())
+    def _firm_link(self, slug): f=PROP_FIRMS.get(slug,{}); return f.get('affiliate_url', f.get('url','#'))
+
+    def _is_configured(self, channel_id):
+        if not channel_id: return False
+        s = str(channel_id)
+        if s in self._disabled_channels: return False
+        if s in ("", "0") or "XXXX" in s: return False
+        return True
+
+    async def _send(self, channel_id, text):
+        """Send message with flood control handling."""
+        try:
+            await self.bot.send_message(
+                chat_id=channel_id, text=text,
+                parse_mode='HTML', disable_web_page_preview=True
+            )
+            return True
+        except RetryAfter as e:
+            wait = e.retry_after + 2
+            log_warn(f"Flood control — waiting {wait}s", tag="ALERT")
+            await asyncio.sleep(wait)
+            # Retry once
+            try:
+                await self.bot.send_message(
+                    chat_id=channel_id, text=text,
+                    parse_mode='HTML', disable_web_page_preview=True
+                )
+                return True
+            except Exception as e2:
+                log_error(f"Retry failed: {e2}", tag="ALERT")
+                return False
+        except (BadRequest, Forbidden) as e:
+            err = str(e).lower()
+            if 'not found' in err or 'kicked' in err or 'blocked' in err:
+                log_warn(f"Channel {channel_id} not accessible — disabling. Fix in .env", tag="ALERT")
+                self._disabled_channels.add(str(channel_id))
+            else:
+                log_error(f"Send error: {e}", tag="ALERT")
+            return False
+        except Exception as e:
+            log_error(f"Send error: {e}", tag="ALERT")
+            return False
+
+    def format_alert(self, change, premium=True):
+        fn = self._firm_name(change['firm_slug'])
+        lk = self._firm_link(change['firm_slug'])
+        em = {"content_update":"🔄","pricing_change":"💰","rules_change":"📋","new_promo":"🎟️","scam_alert":"🚨"}.get(change.get('change_type',''),'🔔')
+        m = f"{em} <b>{fn}</b>\n📄 {change.get('page_type','')}\n📝 {change.get('summary','Change detected')}\n"
+        if change.get('ai_analysis'): m += f"🧠 {change['ai_analysis']}\n"
+        m += f"🕐 {change.get('detected_at','')[:16]}\n"
+        if premium: m += f"🔗 <a href='{lk}'>{fn}</a>"
+        else: m += f"⏳ Premium got this {FREE_ALERT_DELAY_HOURS}h ago\n💎 /premium"
+        m += "\n━━━━━━━━━━━━━━━━━━━━━\n🤖 @PropFirmTrackerBot"
+        return m
+
+    async def send_premium_alerts(self):
+        if not self.bot or not self._is_configured(PREMIUM_CHANNEL_ID): return
+        changes = get_unalerted_changes("premium")
+        if not changes: return
+
+        # Cap alerts per cycle
+        batch = changes[:self.MAX_ALERTS_PER_CYCLE]
+        log_info(f"Sending {len(batch)} alerts to premium ({len(changes)} total pending)...", tag="ALERT")
+
+        sent = 0
+        for change in batch:
+            msg = self.format_alert(change, premium=True)
+            ok = await self._send(PREMIUM_CHANNEL_ID, msg)
+            if ok:
+                mark_change_alerted(change['id'], "premium")
+                sent += 1
+            else:
+                # If channel is disabled, mark ALL as sent to avoid retry spam
+                if str(PREMIUM_CHANNEL_ID) in self._disabled_channels:
+                    for c in changes: mark_change_alerted(c['id'], "premium")
+                    break
+            await asyncio.sleep(self.MSG_DELAY)
+
+        log_info(f"Alerts sent ✓ ({sent}/{len(batch)})", tag="ALERT")
+
+    async def send_free_alerts(self):
+        if not self.bot or not self._is_configured(FREE_CHANNEL_ID): return
+        changes = get_unalerted_changes("free")
+        if not changes: return
+        cutoff = datetime.now() - timedelta(hours=FREE_ALERT_DELAY_HOURS)
+        sent = 0
+        for change in changes[:self.MAX_ALERTS_PER_CYCLE]:
+            detected = datetime.fromisoformat(change['detected_at'])
+            if detected <= cutoff:
+                msg = self.format_alert(change, premium=False)
+                ok = await self._send(FREE_CHANNEL_ID, msg)
+                if ok: mark_change_alerted(change['id'], "free"); sent += 1
+                else:
+                    if str(FREE_CHANNEL_ID) in self._disabled_channels:
+                        for c in changes: mark_change_alerted(c['id'], "free")
+                        break
+                await asyncio.sleep(self.MSG_DELAY)
+
+    async def send_promo_to_channel(self, promo, ch="premium"):
+        cid = PREMIUM_CHANNEL_ID if ch=="premium" else FREE_CHANNEL_ID
+        if not self.bot or not self._is_configured(cid): return
+        fn=self._firm_name(promo['firm_slug']); lk=self._firm_link(promo['firm_slug'])
+        m=f"🎟️ <b>PROMO — {fn}</b>\n💰 {promo.get('discount','')}\n"
+        if promo.get('promo_code'): m+=f"🔑 <code>{promo['promo_code']}</code>\n"
+        m+=f"🔗 <a href='{lk}'>Claim →</a>\n━━━━━━━━━━━━━━━━━━━━━\n🤖 @PropFirmTrackerBot"
+        await self._send(cid, m)

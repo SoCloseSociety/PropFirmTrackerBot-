@@ -1,883 +1,569 @@
 #!/bin/bash
-# ==============================================================
-# PropFirmTracker MEGA-FIX — paste this entire block in SSH
-# Fixes: URLs, false promos, Reddit 403, Trustpilot 403, Chat spam
-# ==============================================================
+# ══════════════════════════════════════════════════════════════
+# PropFirmTracker V3.2 — FIX GARBAGE TEXT + TRUSTPILOT
+# Paste in SSH
+#
+# 1. prop_firms.py  → filter non-readable chars from diff
+# 2. trustpilot.py  → use JSON API instead of HTML scraping
+# ══════════════════════════════════════════════════════════════
 
 cd /root/CRYPTO_JOB/PropFirmTrackerBot-
-
-# Stop bot
 pkill -f "python3 run.py" 2>/dev/null; sleep 1
 
-# Backup
-cp config.py config.py.bak 2>/dev/null
-cp scrapers/prop_firms.py scrapers/prop_firms.py.bak 2>/dev/null
-cp scrapers/reddit_scraper.py scrapers/reddit_scraper.py.bak 2>/dev/null
-cp scrapers/trustpilot_scraper.py scrapers/trustpilot_scraper.py.bak 2>/dev/null
-cp services/alert_service.py services/alert_service.py.bak 2>/dev/null
+echo "🔧 V3.2 — Fix garbage text + Trustpilot"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-# Clean old DB
-rm -f data/propfirm_tracker.db
-
-echo "🔧 Writing fixed files..."
-
-# ============================================================
-# FILE 1: config.py
-# ============================================================
-cat > config.py << 'ENDFILE1'
+# ═══════════════════════════════
+# FILE 1: scrapers/prop_firms.py — CLEAN DIFF
+# ═══════════════════════════════
+echo "📝 [1/2] prop_firms.py (clean diff)..."
+cp scrapers/prop_firms.py scrapers/prop_firms.py.bak.v32
+cat > scrapers/prop_firms.py << 'PROPEOF'
 """
-PropFirmTracker Bot - Configuration
+PropFirmTracker — Prop Firm Scraper V3.2
+Clean diff: filters garbage, only shows readable changes.
 """
-import os
-from dotenv import load_dotenv
-load_dotenv()
-
-TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "YOUR_BOT_TOKEN_HERE")
-FREE_CHANNEL_ID = os.getenv("FREE_CHANNEL_ID", "")
-PREMIUM_CHANNEL_ID = os.getenv("PREMIUM_CHANNEL_ID", "")
-ADMIN_USER_IDS = [int(x) for x in os.getenv("ADMIN_USER_IDS", "123456789").split(",")]
-
-PREMIUM_PRICE_MONTHLY = 14.99
-PREMIUM_PRICE_YEARLY = 119.99
-TRIAL_DAYS = 3
-REFERRAL_REWARD_DAYS = 7
-REFERRALS_NEEDED = 3
-
-SCRAPE_INTERVAL_HOURS = 3
-FREE_ALERT_DELAY_HOURS = 24
-REQUEST_TIMEOUT = 15
-USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
-
-ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "YOUR_ANTHROPIC_KEY_HERE")
-AI_MODEL = "claude-haiku-4-5-20251001"
-AI_MAX_TOKENS = 300
-
-DATABASE_PATH = os.getenv("DATABASE_PATH", "data/propfirm_tracker.db")
-
-STRIPE_API_KEY = os.getenv("STRIPE_API_KEY", "")
-STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET", "")
-CRYPTO_WALLET_USDT_TRC20 = os.getenv("CRYPTO_WALLET", "YOUR_USDT_TRC20_ADDRESS")
-
-PROP_FIRMS = {
-    "ftmo": {
-        "name": "FTMO",
-        "url": "https://ftmo.com/en/",
-        "pricing_url": "https://ftmo.com/en/how-it-works/",
-        "rules_url": "https://ftmo.com/en/trading-objectives/",
-        "blog_url": "https://ftmo.com/en/blog/",
-        "trustpilot": "https://www.trustpilot.com/review/ftmo.com",
-        "affiliate_url": "https://ftmo.com?ref=YOUR_REF_ID",
-        "affiliate_commission": "15%",
-    },
-    "fundednext": {
-        "name": "Funded Next",
-        "url": "https://fundednext.com",
-        "pricing_url": "https://fundednext.com/plan",
-        "rules_url": "https://fundednext.com/evaluation-model",
-        "blog_url": "https://fundednext.com/blog/",
-        "trustpilot": "https://www.trustpilot.com/review/fundednext.com",
-        "affiliate_url": "https://fundednext.com?ref=YOUR_REF_ID",
-        "affiliate_commission": "15%",
-    },
-    "the5ers": {
-        "name": "The 5%ers",
-        "url": "https://the5ers.com/",
-        "pricing_url": "https://the5ers.com/high-stakes/",
-        "rules_url": "https://the5ers.com/bootcamp/",
-        "blog_url": "https://the5ers.com/blog/",
-        "trustpilot": "https://www.trustpilot.com/review/the5ers.com",
-        "affiliate_url": "https://the5ers.com?ref=YOUR_REF_ID",
-        "affiliate_commission": "10%",
-    },
-    "myfundedfx": {
-        "name": "MyFundedFX",
-        "url": "https://myfundedfx.com",
-        "pricing_url": "https://myfundedfx.com/",
-        "rules_url": "https://myfundedfx.com/faq/",
-        "blog_url": "https://myfundedfx.com/blog/",
-        "trustpilot": "https://www.trustpilot.com/review/myfundedfx.com",
-        "affiliate_url": "https://myfundedfx.com?ref=YOUR_REF_ID",
-        "affiliate_commission": "20%",
-    },
-    "topstep": {
-        "name": "TopStep",
-        "url": "https://www.topstep.com",
-        "pricing_url": "https://www.topstep.com/",
-        "rules_url": "https://www.topstep.com/trading-combine/",
-        "blog_url": "https://www.topstep.com/blog/",
-        "trustpilot": "https://www.trustpilot.com/review/topstep.com",
-        "affiliate_url": "https://www.topstep.com?ref=YOUR_REF_ID",
-        "affiliate_commission": "15%",
-    },
-    "apex_trader": {
-        "name": "Apex Trader Funding",
-        "url": "",
-        "pricing_url": "",
-        "rules_url": "",
-        "blog_url": "",
-        "trustpilot": "https://www.trustpilot.com/review/apextraderfunding.com",
-        "affiliate_url": "https://apextraderfunding.com?ref=YOUR_REF_ID",
-        "affiliate_commission": "15%",
-    },
-    "e8_funding": {
-        "name": "E8 Funding",
-        "url": "",
-        "pricing_url": "",
-        "rules_url": "",
-        "blog_url": "",
-        "trustpilot": "https://www.trustpilot.com/review/e8funding.com",
-        "affiliate_url": "https://e8markets.com?ref=YOUR_REF_ID",
-        "affiliate_commission": "12%",
-    },
-    "fundingpips": {
-        "name": "Funding Pips",
-        "url": "https://fundingpips.com",
-        "pricing_url": "https://fundingpips.com/",
-        "rules_url": "",
-        "blog_url": "https://fundingpips.com/blog/",
-        "trustpilot": "https://www.trustpilot.com/review/fundingpips.com",
-        "affiliate_url": "https://fundingpips.com?ref=YOUR_REF_ID",
-        "affiliate_commission": "15%",
-    },
-    "goatfunded": {
-        "name": "Goat Funded Trader",
-        "url": "https://www.goatfundedtrader.com",
-        "pricing_url": "https://www.goatfundedtrader.com/",
-        "rules_url": "",
-        "blog_url": "",
-        "trustpilot": "https://www.trustpilot.com/review/goatfundedtrader.com",
-        "affiliate_url": "https://www.goatfundedtrader.com?ref=YOUR_REF_ID",
-        "affiliate_commission": "15%",
-    },
-    "blueberry_funded": {
-        "name": "Blueberry Funded",
-        "url": "https://blueberryfunded.com",
-        "pricing_url": "https://blueberryfunded.com/",
-        "rules_url": "",
-        "blog_url": "",
-        "trustpilot": "https://www.trustpilot.com/review/blueberryfunded.com",
-        "affiliate_url": "https://blueberryfunded.com?ref=YOUR_REF_ID",
-        "affiliate_commission": "10%",
-    },
-}
-
-REDDIT_SUBREDDITS = ["FundedTrading", "proptrading", "Forex", "FuturesTrading"]
-LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
-LOG_FILE = "data/bot.log"
-ENDFILE1
-echo "  ✅ config.py"
-
-# ============================================================
-# FILE 2: scrapers/prop_firms.py
-# ============================================================
-cat > scrapers/prop_firms.py << 'ENDFILE2'
-"""
-PropFirmTracker Bot - Prop Firm Scraper
-"""
-import hashlib
-import re
-import time
-import random
-import requests
+import hashlib, re, time, requests, difflib
 from bs4 import BeautifulSoup
 from utils.logger import log_info, log_error, log_debug, log_warn
-from database import save_firm_snapshot, save_change, save_promo
+from database import save_firm_snapshot, save_change, save_promo, get_connection
 from config import USER_AGENT, REQUEST_TIMEOUT, PROP_FIRMS
 
 
 class PropFirmScraper:
-    FALSE_POSITIVE_CODES = {
-        'HTTP','HTML','HTTPS','TRUE','FALSE','NULL','NONE','JSON','CSRF','UTF8',
-        'HREF','TYPE','TEXT','META','DATA','FORM','FONT','LINK','BODY','HEAD',
-        'SPAN','ASYNC','DEFER','CLASS','WIDTH','INPUT','IMAGE',
-        'CODE','PROMO','ENTER','APPLY','COUPON','FREE','OFFER','DEALS','BONUS',
-        'CLAIM','REDEEM','SALE',
-        'PLEASE','CLICK','HERE','YOUR','THIS','THAT','WITH','FROM','HAVE','WILL',
-        'JUST','MORE','ALSO','SOME','THAN','THEM','THEN','WHEN','WHAT','WHICH',
-        'WHERE','WHILE','WOULD','COULD','SHOULD','AFTER','BEFORE','ABOUT','THEIR',
-        'OTHER','EVERY','THESE','THOSE','BEING','ABOVE','BELOW','UNDER','OVER',
-        'EACH','ONLY','MOST','SUCH','BOTH','INTO','VERY','MUCH','MANY','WELL',
-        'BACK','EVEN','MADE','MAKE','LIKE','LONG','COME','TAKE','KNOW','LOOK',
-        'GIVE','GOOD','BEST','NEXT','LAST','MUST','NEED','WANT','DOES','DONE',
-        'BEEN','WERE','GOES','GONE','KEEP','LEFT','HELP','SURE','FULL','REAL',
-        'OPEN','ABLE','USED','SAME','WORK','FIND','SHOW','PART','DOWN','UPON',
-        'CALL','STILL','FIRST','WORLD','THINK','START','PLACE','GROUP','SINCE',
-        'GREAT','SMALL','LARGE','NEVER','RIGHT','UNTIL','THREE','AGAIN','STATE',
-        'LEVEL','ORDER',
-        'TRADE','TRADER','TRADING','FOREX','FUNDED','PROFIT','SPLIT','TARGET',
-        'DAILY','PAYOUT','RULES','ACCOUNT','BALANCE','EQUITY','MARGIN','LEVERAGE',
-        'SPREAD','SCALING','CHALLENGE','EVALUATION','VERIFICATION','PHASE','STAGE',
-        'MAXIMUM','MINIMUM','LIMIT','CAPITAL','FUNDS','MARKET','PRICE','PLAN',
-        'STEP','MODEL','EXPRESS','STELLAR','INSTANT','STANDARD','NORMAL','PREMIUM',
-        'BASIC','ELITE','ADVANCED','DURING','CUSTOMER','TECHNOLOGY','SERVICE',
-        'COMPANY','PLATFORM','PROGRAM','SUPPORT','CONTACT','POLICY','PRIVACY',
-        'TERMS','MANAGE','SELECT','CHOOSE','OPTION','REWARD','WITHDRAW','DEPOSIT',
-        'REFUND','VERIFY','COMPLETE','SUBMIT','REGISTER','LOGIN','SIGN','JOIN',
-        'CHECK','LEARN','MONTH','YEAR','WEEK','TIME','DATE','NOTE','READ','SIZE',
-        'RISK','LOSS','SWING','SCALP','SWAP','STOP','ENTRY',
-        'FTMO','TOPSTEP','APEX','GOAT','BLUEBERRY','BERRY','PIPS','HYPER',
-        'BOOTCAMP','COMBINE','GROWTH','FIRSTGFT',
-    }
+
+    RULES_KEYWORDS = [
+        'drawdown', 'profit target', 'profit split', 'max loss', 'daily loss',
+        'trailing', 'leverage', 'lot size', 'minimum trading days', 'payout',
+        'scaling', 'news trading', 'weekend', 'ea allowed', 'copy trading',
+        'consistency', 'max allocation',
+    ]
+    PROMO_SIGNALS = [
+        'promo', 'discount', 'coupon', 'sale', 'offer', 'deal', 'special',
+        'limited time', 'flash', 'save', '% off', 'bogo', 'free trial', 'bonus',
+    ]
 
     def __init__(self):
         self.session = requests.Session()
         self.session.headers.update({
             "User-Agent": USER_AGENT,
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
             "Accept-Language": "en-US,en;q=0.9",
-            "Accept-Encoding": "gzip, deflate, br",
-            "Sec-Ch-Ua": '"Chromium";v="131", "Not_A Brand";v="24"',
-            "Sec-Ch-Ua-Mobile": "?0",
-            "Sec-Ch-Ua-Platform": '"Windows"',
-            "Sec-Fetch-Dest": "document",
-            "Sec-Fetch-Mode": "navigate",
-            "Sec-Fetch-Site": "none",
-            "Sec-Fetch-User": "?1",
-            "Upgrade-Insecure-Requests": "1",
         })
         self.results = {"scraped": 0, "changes": 0, "errors": 0, "promos": 0}
 
     def _fetch_page(self, url):
         try:
-            response = self.session.get(url, timeout=REQUEST_TIMEOUT)
-            response.raise_for_status()
-            soup = BeautifulSoup(response.text, 'html.parser')
-            for tag in soup(['script', 'style', 'nav', 'footer', 'header', 'iframe', 'noscript']):
+            resp = self.session.get(url, timeout=REQUEST_TIMEOUT)
+            resp.raise_for_status()
+            soup = BeautifulSoup(resp.text, 'html.parser')
+            for tag in soup(['script', 'style', 'nav', 'footer', 'header', 'iframe', 'noscript', 'svg', 'path']):
                 tag.decompose()
             text = soup.get_text(separator='\n', strip=True)
             text = re.sub(r'\n{3,}', '\n\n', text)
             text = re.sub(r' {2,}', ' ', text)
             return soup, text
-        except requests.RequestException as e:
-            log_error(f"Failed to fetch {url}: {e}", tag="SCRAPE")
+        except Exception as e:
+            log_error(f"Fetch {url}: {e}", tag="SCRAPE")
             return None, None
 
-    def _hash_content(self, text):
-        if not text:
-            return None
-        normalized = re.sub(r'\s+', ' ', text.strip().lower())
-        if not normalized:
-            return None
-        return hashlib.md5(normalized.encode('utf-8')).hexdigest()
+    def _hash(self, text):
+        if not text: return None
+        norm = re.sub(r'\s+', ' ', text.strip().lower())
+        return hashlib.md5(norm.encode()).hexdigest() if norm else None
 
-    def _is_valid_promo_code(self, code):
-        upper = code.upper()
-        if len(upper) < 4 or len(upper) > 20:
+    def _is_readable(self, line):
+        """Check if a line is human-readable text (not binary/encoded garbage)."""
+        if not line or len(line) < 3:
             return False
-        if upper in self.FALSE_POSITIVE_CODES:
+        # Count printable ASCII + common unicode chars
+        printable = sum(1 for c in line if c.isprintable() and (ord(c) < 128 or c in 'éèêëàâäùûüôöîïçñ€£¥'))
+        total = len(line)
+        # Must be >80% printable ASCII
+        if total > 0 and printable / total < 0.8:
             return False
-        if not any(c.isdigit() for c in upper):
+        # Skip lines that are mostly symbols/numbers with no words
+        words = re.findall(r'[a-zA-Z]{3,}', line)
+        if len(line) > 20 and len(words) < 1:
             return False
-        if not upper[0].isalpha():
+        # Skip very short meaningless fragments
+        if len(line.strip()) < 5:
+            return False
+        # Skip common noise
+        noise = ['cookie', 'javascript', 'var ', 'function(', '{', '}', 'window.', 'document.',
+                 'google', 'analytics', 'gtag', 'fbq', 'pixel', '©', 'all rights reserved',
+                 'accept cookies', 'privacy policy', 'terms of service', 'toggle navigation']
+        if any(n in line.lower() for n in noise):
             return False
         return True
 
-    def _extract_promos(self, soup, text, firm_slug, url):
-        if not text:
-            return
-        promo_patterns = [
-            r'(?:code|coupon)[:\s]+["\'']?([A-Z0-9]{4,20})["\'']?',
-            r'promo\s+code[:\s]+["\'']?([A-Z0-9]{4,20})["\'']?',
-            r'(?:use|enter|apply)\s+(?:code\s+)?["\'']?([A-Z][A-Z0-9]{3,19})["\'']?',
-            r'([A-Z][A-Z0-9]{3,14})\s+(?:for|to get)\s+(\d+%?\s*(?:off|discount))',
-        ]
-        discount_patterns = [
-            r'(\d+%\s*off)', r'(save\s*\d+%)', r'(\d+%\s*discount)', r'(\$\d+\s*off)',
-        ]
-        found_codes = set()
-        for pattern in promo_patterns:
-            for match in re.finditer(pattern, text, re.IGNORECASE):
-                code = match.group(1).upper()
-                if self._is_valid_promo_code(code):
-                    found_codes.add(code)
-        discount = ""
-        for pattern in discount_patterns:
-            match = re.search(pattern, text, re.IGNORECASE)
-            if match:
-                discount = match.group(1)
+    def _clean_line(self, line):
+        """Clean a line for display — remove HTML entities, extra spaces."""
+        line = re.sub(r'&[a-z]+;', ' ', line)
+        line = re.sub(r'&#\d+;', ' ', line)
+        line = re.sub(r'[^\x20-\x7E\n]', '', line)  # Remove non-ASCII
+        line = re.sub(r'\s+', ' ', line).strip()
+        return line[:120]  # Max 120 chars per line
+
+    def _get_old_content(self, firm_slug, page_type):
+        try:
+            conn = get_connection()
+            row = conn.execute(
+                "SELECT content, content_hash FROM firm_snapshots WHERE firm_slug=? AND page_type=?",
+                (firm_slug, page_type)
+            ).fetchone()
+            conn.close()
+            if row: return row['content'], row['content_hash']
+        except: pass
+        return None, None
+
+    def _smart_diff(self, old_text, new_text, firm_name, page_type):
+        """Compare old vs new, return clean readable summary."""
+        if not old_text or not new_text:
+            return f"Initial scan of {firm_name} {page_type}", "content_update"
+
+        old_lines = [l.strip() for l in old_text.split('\n') if l.strip()]
+        new_lines = [l.strip() for l in new_text.split('\n') if l.strip()]
+
+        differ = difflib.unified_diff(old_lines, new_lines, lineterm='')
+        added_raw, removed_raw = [], []
+        for line in differ:
+            if line.startswith('+') and not line.startswith('+++'):
+                added_raw.append(line[1:].strip())
+            elif line.startswith('-') and not line.startswith('---'):
+                removed_raw.append(line[1:].strip())
+
+        # FILTER: only keep readable lines
+        added = [self._clean_line(l) for l in added_raw if self._is_readable(l)]
+        removed = [self._clean_line(l) for l in removed_raw if self._is_readable(l)]
+
+        if not added and not removed:
+            return f"{firm_name} {page_type}: minor technical changes", "content_update"
+
+        # Categorize
+        change_type = self._categorize(added, removed, page_type)
+
+        # Build summary
+        summary = self._build_summary(firm_name, page_type, change_type, added, removed)
+        return summary, change_type
+
+    def _categorize(self, added, removed, page_type):
+        all_text = ' '.join(added + removed).lower()
+        has_price = bool(re.search(r'\$[\d,]+|\d+%\s*(?:off|discount)', all_text))
+        has_rules = any(kw in all_text for kw in self.RULES_KEYWORDS)
+        has_promo = any(kw in all_text for kw in self.PROMO_SIGNALS)
+        if has_promo: return "new_promo"
+        if page_type == "pricing" or has_price: return "pricing_change"
+        if page_type == "rules" or has_rules: return "rules_change"
+        return "content_update"
+
+    def _build_summary(self, firm_name, page_type, change_type, added, removed):
+        type_labels = {"pricing_change":"Pricing Update","rules_change":"Rules Update",
+                       "new_promo":"Promo Detected","content_update":"Content Update"}
+        label = type_labels.get(change_type, "Update")
+
+        parts = []
+
+        # Price changes
+        old_nums = self._nums(removed)
+        new_nums = self._nums(added)
+        if old_nums and new_nums:
+            parts.append(f"Values: {', '.join(old_nums[:3])} → {', '.join(new_nums[:3])}")
+
+        # Rule keyword matches
+        for kw in self.RULES_KEYWORDS:
+            if any(kw in a.lower() for a in added) or any(kw in r.lower() for r in removed):
+                parts.append(f"'{kw}' section modified")
                 break
-        for code in found_codes:
-            saved = save_promo(
-                firm_slug=firm_slug, promo_code=code,
-                discount=discount or "Unknown",
-                description=f"Promo code found on {firm_slug} website",
-                source_url=url
-            )
+
+        # Top meaningful additions
+        if added:
+            best = sorted([a for a in added if len(a) > 15], key=len, reverse=True)
+            if best:
+                parts.append(f"New: {best[0][:100]}")
+            if len(best) > 1:
+                parts.append(f"New: {best[1][:80]}")
+
+        # Top meaningful removals
+        if removed and not parts:
+            best = sorted([r for r in removed if len(r) > 15], key=len, reverse=True)
+            if best:
+                parts.append(f"Removed: {best[0][:100]}")
+
+        # Fallback
+        if not parts:
+            parts.append(f"{len(added)} additions, {len(removed)} removals on {page_type}")
+
+        return f"{label}\n" + "\n".join(parts[:4])
+
+    def _nums(self, lines):
+        nums = []
+        for l in lines:
+            nums.extend(re.findall(r'\$[\d,]+(?:\.\d{2})?', l))
+            nums.extend(re.findall(r'\d+(?:\.\d+)?%', l))
+        return list(dict.fromkeys(nums))[:5]
+
+    def _extract_promos(self, soup, text, firm_slug, url):
+        if not text: return
+        code_patterns = [
+            r'(?:code|coupon|promo)[:\s]+["\']?([A-Z0-9]{4,20})["\']?',
+            r'(?:use|enter|apply)\s+(?:code\s+)?["\']?([A-Z][A-Z0-9]{3,19})["\']?',
+            r'([A-Z][A-Z0-9]{3,14})\s+(?:for|to\s+get|gives?)\s+(\d+%?\s*(?:off|discount))',
+            r'(?:discount\s+code|voucher)[:\s]+["\']?([A-Z0-9]{4,20})["\']?',
+            r'\b((?:BOGO|SAVE|SALE|DEAL|GET|NEW|VIP|BLACK|XMAS|NY)[A-Z0-9]{1,15})\b',
+        ]
+        blacklist = {
+            'HTTP','HTML','HTTPS','TRUE','FALSE','NULL','NONE','CODE','PROMO',
+            'ENTER','APPLY','COUPON','FREE','PLEASE','CLICK','HERE','YOUR',
+            'THIS','THAT','WITH','FROM','HAVE','WILL','JUST','MORE','ALSO',
+            'SOME','THAN','THEM','THEN','WHEN','ABOUT','BACK','BEEN','COME',
+            'EACH','EVEN','FIRST','GOOD','HIGH','INTO','KEEP','LAST','LONG',
+            'MADE','MAKE','MANY','MUCH','MUST','NAME','NEXT','ONLY','OVER',
+            'PART','SAME','TAKE','TELL','VERY','WANT','WELL','WORK',
+            'YEAR','USED','USING','REVIEW','REVIEWS','TRADE','TRADER','TRADING',
+            'ACCOUNT','FUNDED','FUNDING','PROFIT','TARGET','SPLIT','RULES',
+            'CHALLENGE','EVALUATION','PHASE','STEP','DAILY','TOTAL','LOSS',
+            'PAYOUT','PAYOUTS','WITHDRAWAL','PROP','FIRM','TEST','DEMO',
+            'SAVE','BOGO','SALE','DEAL','GET','NEW','BLACK','XMAS',
+        }
+        found = set()
+        for pat in code_patterns:
+            for m in re.finditer(pat, text, re.IGNORECASE):
+                code = m.group(1).upper() if m.lastindex else m.group(0).upper()
+                has_digit = any(c.isdigit() for c in code)
+                if len(code) >= 4 and code not in blacklist and has_digit:
+                    found.add(code)
+
+        discount = ""
+        for p in [r'(\d+%\s*off)', r'(\d+%\s*discount)', r'(save\s*\d+%)', r'(\$\d+\s*off)']:
+            m = re.search(p, text, re.IGNORECASE)
+            if m: discount = m.group(1).upper(); break
+
+        for code in found:
+            saved = save_promo(firm_slug=firm_slug, promo_code=code, discount=discount or "See website",
+                description=f"Found on {firm_slug}", source_url=url)
             if saved:
                 self.results["promos"] += 1
-                log_info(f"🎟️  New promo found: {firm_slug} — {code} ({discount})", tag="SCRAPE")
+                log_info(f"🎟️ {firm_slug}: {code} ({discount})", tag="SCRAPE")
 
-    def scrape_firm(self, firm_slug, firm_config):
-        log_info(f"Scraping {firm_config['name']}...", tag="SCRAPE")
-        pages_to_scrape = {
-            "pricing": firm_config.get("pricing_url"),
-            "rules": firm_config.get("rules_url"),
-            "homepage": firm_config.get("url"),
-            "blog": firm_config.get("blog_url"),
-        }
-        scraped_urls = set()
-        for page_type, url in pages_to_scrape.items():
-            if not url or url in scraped_urls:
-                continue
-            scraped_urls.add(url)
+    def scrape_firm(self, slug, cfg):
+        log_info(f"Scraping {cfg['name']}...", tag="SCRAPE")
+        pages = {"pricing": cfg.get("pricing_url"), "rules": cfg.get("rules_url"),
+                 "homepage": cfg.get("url"), "blog": cfg.get("blog_url")}
+        for pt, url in pages.items():
+            if not url: continue
             soup, text = self._fetch_page(url)
-            if not text:
-                self.results["errors"] += 1
-                continue
+            if not text: self.results["errors"] += 1; continue
             self.results["scraped"] += 1
-            content_hash = self._hash_content(text)
-            changed = save_firm_snapshot(firm_slug, page_type, content_hash, text[:5000])
-            if changed:
+            new_hash = self._hash(text)
+            old_content, old_hash = self._get_old_content(slug, pt)
+            changed = save_firm_snapshot(slug, pt, new_hash, text[:5000])
+            if changed and old_hash and old_hash != new_hash:
+                summary, ct = self._smart_diff(old_content, text[:5000], cfg['name'], pt)
                 self.results["changes"] += 1
-                save_change(
-                    firm_slug=firm_slug, page_type=page_type,
-                    change_type="content_update", old_hash=None,
-                    new_hash=content_hash,
-                    summary=f"{firm_config['name']} - {page_type} page has been updated"
-                )
-            if page_type in ("pricing", "homepage"):
-                self._extract_promos(soup, text, firm_slug, url)
-            time.sleep(random.uniform(1, 2.5))
+                save_change(firm_slug=slug, page_type=pt, change_type=ct,
+                    old_hash=old_hash, new_hash=new_hash, summary=summary)
+                log_info(f"📝 {cfg['name']}/{pt}: {ct}", tag="DIFF")
+            elif changed and not old_hash:
+                save_change(firm_slug=slug, page_type=pt, change_type="content_update",
+                    old_hash=None, new_hash=new_hash,
+                    summary=f"Initial scan of {cfg['name']} {pt}")
+            if pt in ("pricing", "homepage"):
+                self._extract_promos(soup, text, slug, url)
+            time.sleep(1)
 
     def scrape_all(self):
-        log_info(f"Starting full scrape of {len(PROP_FIRMS)} prop firms...", tag="SCRAPE")
-        self.results = {"scraped": 0, "changes": 0, "errors": 0, "promos": 0}
-        for firm_slug, firm_config in PROP_FIRMS.items():
-            try:
-                self.scrape_firm(firm_slug, firm_config)
-            except Exception as e:
-                log_error(f"Error scraping {firm_slug}: {e}", tag="SCRAPE")
-                self.results["errors"] += 1
-            time.sleep(random.uniform(2, 4))
-        log_info(
-            f"Scrape complete — Pages: {self.results['scraped']} | "
-            f"Changes: {self.results['changes']} | "
-            f"Promos: {self.results['promos']} | "
-            f"Errors: {self.results['errors']}", tag="SCRAPE"
-        )
+        log_info(f"Scraping {len(PROP_FIRMS)} firms...", tag="SCRAPE")
+        self.results = {"scraped":0,"changes":0,"errors":0,"promos":0}
+        for s,c in PROP_FIRMS.items():
+            try: self.scrape_firm(s, c)
+            except Exception as e: log_error(f"{s}: {e}", tag="SCRAPE"); self.results["errors"]+=1
+            time.sleep(2)
+        log_info(f"Scrape: {self.results['scraped']}p {self.results['changes']}c {self.results['promos']}p {self.results['errors']}e", tag="SCRAPE")
         return self.results
-ENDFILE2
-echo "  ✅ scrapers/prop_firms.py"
+PROPEOF
+echo "  ✅ prop_firms.py"
 
-# ============================================================
-# FILE 3: scrapers/reddit_scraper.py
-# ============================================================
-cat > scrapers/reddit_scraper.py << 'ENDFILE3'
+# ═══════════════════════════════
+# FILE 2: scrapers/trustpilot_scraper.py — JSON API
+# ═══════════════════════════════
+echo "📝 [2/2] trustpilot_scraper.py (JSON API)..."
+cp scrapers/trustpilot_scraper.py scrapers/trustpilot_scraper.py.bak.v32
+cat > scrapers/trustpilot_scraper.py << 'TPEOF'
 """
-PropFirmTracker Bot - Reddit Scraper
+Trustpilot Scraper V3.2 — Uses JSON APIs, not HTML scraping
+Trustpilot blocks HTML scraping with Cloudflare.
+Instead we use their public JSON endpoints that their own frontend uses.
 """
-import re
-import time
-import random
-import requests
-from utils.logger import log_info, log_error, log_debug, log_warn
-from database import save_reddit_mention, save_scam_alert
-from config import PROP_FIRMS, REDDIT_SUBREDDITS, REQUEST_TIMEOUT
-
-
-class RedditScraper:
-    def __init__(self):
-        self.session = requests.Session()
-        self.session.headers.update({
-            "User-Agent": "PropFirmTracker/1.0 (telegram bot; monitoring prop firm discussions)",
-            "Accept": "application/json",
-        })
-        self.firm_names = {slug: cfg['name'].lower() for slug, cfg in PROP_FIRMS.items()}
-        self.results = {"posts_found": 0, "mentions": 0, "scam_alerts": 0, "errors": 0}
-
-    def _get_subreddit_posts(self, subreddit, sort="new", limit=25):
-        url = f"https://www.reddit.com/r/{subreddit}/{sort}.json?limit={limit}&raw_json=1"
-        try:
-            response = self.session.get(url, timeout=REQUEST_TIMEOUT)
-            if response.status_code == 429:
-                retry_after = int(response.headers.get('Retry-After', 10))
-                log_warn(f"Reddit rate limit, waiting {retry_after}s...", tag="SCRAPE")
-                time.sleep(retry_after)
-                response = self.session.get(url, timeout=REQUEST_TIMEOUT)
-            response.raise_for_status()
-            data = response.json()
-            posts = data.get('data', {}).get('children', [])
-            return [p['data'] for p in posts if p.get('data')]
-        except requests.exceptions.HTTPError as e:
-            if hasattr(e, 'response') and e.response is not None and e.response.status_code == 403:
-                log_warn(f"r/{subreddit}: Reddit blocked (403) — may need OAuth token", tag="SCRAPE")
-            else:
-                log_error(f"Failed to fetch r/{subreddit}: {e}", tag="SCRAPE")
-            self.results["errors"] += 1
-            return []
-        except Exception as e:
-            log_error(f"Failed to fetch r/{subreddit}: {e}", tag="SCRAPE")
-            self.results["errors"] += 1
-            return []
-
-    def _detect_firm_mention(self, text):
-        text_lower = text.lower()
-        mentioned = []
-        name_to_slug = {}
-        for slug, cfg in PROP_FIRMS.items():
-            names = [cfg['name'].lower(), slug.replace('_', ' ')]
-            if slug == "ftmo":
-                names.extend(["ftmo"])
-            elif slug == "fundednext":
-                names.extend(["funded next", "fundednext"])
-            elif slug == "the5ers":
-                names.extend(["the5ers", "the 5ers", "5ers", "five percenters"])
-            elif slug == "myfundedfx":
-                names.extend(["myfundedfx", "my funded fx"])
-            elif slug == "topstep":
-                names.extend(["topstep", "top step"])
-            elif slug == "apex_trader":
-                names.extend(["apex trader", "apex funding", "atf"])
-            elif slug == "e8_funding":
-                names.extend(["e8 funding", "e8 markets", "e8markets"])
-            elif slug == "fundingpips":
-                names.extend(["funding pips", "fundingpips"])
-            elif slug == "goatfunded":
-                names.extend(["goat funded", "goatfunded"])
-            elif slug == "blueberry_funded":
-                names.extend(["blueberry funded", "blueberryfunded"])
-            for name in names:
-                name_to_slug[name] = slug
-        for name, slug in name_to_slug.items():
-            if name in text_lower and slug not in mentioned:
-                mentioned.append(slug)
-        return mentioned
-
-    def _detect_scam_keywords(self, text):
-        text_lower = text.lower()
-        scam_keywords = [
-            'scam', 'fraud', 'ponzi', 'rug pull', "won't pay", 'not paying',
-            'refused payout', 'denied payout', 'stole my', 'stolen', 'avoid',
-            'stay away', 'do not use', 'warning', 'shut down', 'shutdown',
-            'bankrupt', 'disappeared', 'no payout', 'payout denied',
-            'fake reviews', 'manipulated', 'rigged',
-        ]
-        severity_high = ['scam', 'fraud', 'ponzi', 'rug pull', 'stole', 'stolen', 'bankrupt']
-        found_keywords = [kw for kw in scam_keywords if kw in text_lower]
-        if found_keywords:
-            is_high = any(kw in text_lower for kw in severity_high)
-            return {"is_scam_report": True, "keywords": found_keywords,
-                    "severity": "high" if is_high else "medium"}
-        return {"is_scam_report": False}
-
-    def _analyze_sentiment(self, text, score):
-        text_lower = text.lower()
-        positive = ['great', 'excellent', 'recommend', 'best', 'love', 'amazing',
-                     'paid out', 'got payout', 'legit', 'reliable', 'fast payout', 'good experience']
-        negative = ['terrible', 'worst', 'avoid', 'scam', 'horrible', 'trash', 'garbage',
-                     'slow payout', 'bad experience', 'disappointed', 'regret']
-        pos_count = sum(1 for w in positive if w in text_lower)
-        neg_count = sum(1 for w in negative if w in text_lower)
-        if neg_count > pos_count:
-            return "negative"
-        elif pos_count > neg_count:
-            return "positive"
-        return "neutral"
-
-    def scrape_subreddit(self, subreddit):
-        log_info(f"Scraping r/{subreddit}...", tag="SCRAPE")
-        posts = self._get_subreddit_posts(subreddit)
-        self.results["posts_found"] += len(posts)
-        for post in posts:
-            title = post.get('title', '')
-            selftext = post.get('selftext', '')
-            full_text = f"{title} {selftext}"
-            post_url = f"https://reddit.com{post.get('permalink', '')}"
-            score = post.get('score', 0)
-            mentioned_firms = self._detect_firm_mention(full_text)
-            if not mentioned_firms:
-                if any(kw in full_text.lower() for kw in ['prop firm', 'funded account', 'prop trading']):
-                    mentioned_firms = ['general']
-            for firm_slug in mentioned_firms:
-                sentiment = self._analyze_sentiment(full_text, score)
-                save_reddit_mention(
-                    firm_slug=firm_slug, subreddit=subreddit,
-                    post_title=title[:200], post_url=post_url,
-                    score=score, sentiment=sentiment
-                )
-                self.results["mentions"] += 1
-                scam_check = self._detect_scam_keywords(full_text)
-                if scam_check["is_scam_report"] and firm_slug != 'general':
-                    save_scam_alert(
-                        firm_slug=firm_slug, alert_type="reddit_scam_report",
-                        severity=scam_check["severity"],
-                        description=f"Reddit post: {title[:150]}", source=post_url
-                    )
-                    self.results["scam_alerts"] += 1
-                    log_info(f"⚠️  Scam report: {firm_slug}: {title[:80]}", tag="ALERT")
-
-    def scrape_all(self):
-        log_info(f"Starting Reddit scrape of {len(REDDIT_SUBREDDITS)} subreddits...", tag="SCRAPE")
-        self.results = {"posts_found": 0, "mentions": 0, "scam_alerts": 0, "errors": 0}
-        for subreddit in REDDIT_SUBREDDITS:
-            try:
-                self.scrape_subreddit(subreddit)
-            except Exception as e:
-                log_error(f"Error scraping r/{subreddit}: {e}", tag="SCRAPE")
-                self.results["errors"] += 1
-            time.sleep(random.uniform(2, 4))
-        log_info(
-            f"Reddit scrape complete — Posts: {self.results['posts_found']} | "
-            f"Mentions: {self.results['mentions']} | "
-            f"Scam alerts: {self.results['scam_alerts']} | "
-            f"Errors: {self.results['errors']}", tag="SCRAPE"
-        )
-        return self.results
-ENDFILE3
-echo "  ✅ scrapers/reddit_scraper.py"
-
-# ============================================================
-# FILE 4: scrapers/trustpilot_scraper.py
-# ============================================================
-cat > scrapers/trustpilot_scraper.py << 'ENDFILE4'
-"""
-PropFirmTracker Bot - Trustpilot Scraper
-"""
-import json
-import re
-import time
-import random
-import requests
-from bs4 import BeautifulSoup
-from utils.logger import log_info, log_error, log_debug, log_warn
+import re, time, random, json, requests
+from utils.logger import log_info, log_error, log_warn
 from database import save_trustpilot_score, get_latest_trustpilot_scores, save_scam_alert
-from config import PROP_FIRMS, USER_AGENT, REQUEST_TIMEOUT
+from config import PROP_FIRMS, REQUEST_TIMEOUT
 
 
 class TrustpilotScraper:
-    SCORE_DROP_THRESHOLD = 0.3
-    LOW_SCORE_THRESHOLD = 2.5
-    NEGATIVE_SPIKE_REVIEWS = 10
+    SCORE_DROP = 0.3
+    LOW_SCORE = 2.5
+
+    # Trustpilot public API endpoints (used by their own website)
+    # 1. Categories page API — returns business unit data as JSON
+    API_URL = "https://www.trustpilot.com/api/categoriespages/{domain}"
+    # 2. Widget API — used for embedding widgets (no Cloudflare)
+    WIDGET_URL = "https://widget.trustpilot.com/trustboxes/findBusinessUnit"
+
+    UAS = [
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/131.0.0.0 Safari/537.36",
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/131.0.0.0 Safari/537.36",
+    ]
 
     def __init__(self):
         self.session = requests.Session()
-        self.session.headers.update({
-            "User-Agent": USER_AGENT,
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-            "Accept-Language": "en-US,en;q=0.9",
-            "Accept-Encoding": "gzip, deflate, br",
-            "Cache-Control": "no-cache",
-            "Sec-Ch-Ua": '"Chromium";v="131", "Not_A Brand";v="24"',
-            "Sec-Ch-Ua-Mobile": "?0",
-            "Sec-Ch-Ua-Platform": '"Windows"',
-            "Sec-Fetch-Dest": "document",
-            "Sec-Fetch-Mode": "navigate",
-            "Sec-Fetch-Site": "none",
-            "Sec-Fetch-User": "?1",
-            "Upgrade-Insecure-Requests": "1",
-            "Referer": "https://www.google.com/",
-        })
         self.results = {"scraped": 0, "score_drops": 0, "low_scores": 0, "errors": 0}
 
-    def _scrape_trustpilot_page(self, url):
+    def _api_headers(self):
+        return {
+            "User-Agent": random.choice(self.UAS),
+            "Accept": "application/json",
+            "Accept-Language": "en-US,en;q=0.9",
+            "Referer": "https://www.trustpilot.com/",
+            "Origin": "https://www.trustpilot.com",
+            "X-Requested-With": "XMLHttpRequest",
+        }
+
+    def _widget_headers(self):
+        return {
+            "User-Agent": random.choice(self.UAS),
+            "Accept": "application/json, text/javascript, */*; q=0.01",
+            "Accept-Language": "en-US,en;q=0.9",
+            "Referer": "https://www.trustpilot.com/",
+        }
+
+    def _extract_domain(self, trustpilot_url):
+        """Extract domain from trustpilot URL like https://www.trustpilot.com/review/ftmo.com"""
+        m = re.search(r'trustpilot\.com/review/([^/?#]+)', trustpilot_url)
+        return m.group(1) if m else None
+
+    def _scrape_via_api(self, domain):
+        """Method 1: Trustpilot categories page API."""
+        url = self.API_URL.format(domain=domain)
         try:
-            response = self.session.get(url, timeout=REQUEST_TIMEOUT)
-            if response.status_code in (403, 429):
-                log_warn(f"Trustpilot blocked ({response.status_code}): {url}", tag="SCRAPE")
+            resp = self.session.get(url, headers=self._api_headers(), timeout=REQUEST_TIMEOUT)
+            if resp.status_code != 200:
                 return None, None
-            response.raise_for_status()
-            soup = BeautifulSoup(response.text, 'html.parser')
-            score = None
-            review_count = None
 
-            for script in soup.find_all('script', type='application/ld+json'):
-                try:
-                    raw = script.string
-                    if not raw:
-                        continue
-                    data = json.loads(raw)
-                    if isinstance(data, dict) and 'aggregateRating' in data:
-                        rating = data['aggregateRating']
-                        score = float(rating.get('ratingValue', 0))
-                        review_count = int(rating.get('reviewCount', 0))
-                        break
-                    if isinstance(data, list):
-                        for item in data:
-                            if isinstance(item, dict) and 'aggregateRating' in item:
-                                rating = item['aggregateRating']
-                                score = float(rating.get('ratingValue', 0))
-                                review_count = int(rating.get('reviewCount', 0))
-                                break
-                        if score is not None:
+            data = resp.json()
+
+            # Navigate the JSON structure
+            # The structure varies but usually has businessUnit.trustScore
+            bu = data.get('businessUnit') or data.get('pageProps', {}).get('businessUnit', {})
+            if not bu:
+                # Try nested
+                for key in ['props', 'pageProps', 'businessUnitResult']:
+                    if key in data and isinstance(data[key], dict):
+                        bu = data[key].get('businessUnit', data[key])
+                        if 'trustScore' in bu or 'score' in bu:
                             break
-                except (json.JSONDecodeError, ValueError, TypeError, KeyError):
-                    continue
 
-            if score is None:
-                text = soup.get_text()
-                score_match = re.search(r'TrustScore\s+(\d+\.?\d*)', text)
-                if score_match:
-                    score = float(score_match.group(1))
-                review_match = re.search(r'([\d,]+)\s+reviews?', text, re.IGNORECASE)
-                if review_match:
-                    review_count = int(review_match.group(1).replace(',', ''))
+            score = bu.get('trustScore') or bu.get('score')
+            count = bu.get('numberOfReviews') or bu.get('reviewCount')
 
-            return score, review_count
+            if score and isinstance(score, (int, float)):
+                return float(score), int(count or 0)
+
+            # Try alternative paths
+            if 'trustScore' in str(data):
+                # Deep search for trustScore
+                text = json.dumps(data)
+                sm = re.search(r'"trustScore":\s*([\d.]+)', text)
+                cm = re.search(r'"numberOfReviews":\s*(\d+)', text)
+                if sm:
+                    return float(sm.group(1)), int(cm.group(1)) if cm else 0
+
+            return None, None
         except Exception as e:
-            log_error(f"Trustpilot error {url}: {e}", tag="SCRAPE")
+            log_error(f"TP API {domain}: {e}", tag="SCRAPE")
             return None, None
 
-    def scrape_firm(self, firm_slug, firm_config):
-        trustpilot_url = firm_config.get("trustpilot")
-        if not trustpilot_url:
+    def _scrape_via_widget(self, domain):
+        """Method 2: Trustpilot widget API (usually not behind Cloudflare)."""
+        try:
+            params = {"locale": "en-US", "query": domain}
+            resp = self.session.get(self.WIDGET_URL, params=params,
+                headers=self._widget_headers(), timeout=REQUEST_TIMEOUT)
+            if resp.status_code != 200:
+                return None, None
+
+            data = resp.json()
+            # Widget returns a list of matching businesses
+            if isinstance(data, list) and data:
+                bu = data[0]
+            elif isinstance(data, dict):
+                bu = data
+            else:
+                return None, None
+
+            score = bu.get('score') or bu.get('trustScore')
+            count = bu.get('numberOfReviews') or bu.get('reviewCount')
+
+            if score: return float(score), int(count or 0)
+            return None, None
+        except Exception as e:
+            log_error(f"TP Widget {domain}: {e}", tag="SCRAPE")
+            return None, None
+
+    def _scrape_via_embed(self, domain):
+        """Method 3: Trustpilot mini embed page (simpler HTML, less protection)."""
+        url = f"https://www.trustpilot.com/review/{domain}"
+        try:
+            resp = self.session.get(url, headers={
+                "User-Agent": random.choice(self.UAS),
+                "Accept": "text/html,*/*",
+                "Accept-Language": "en-US,en;q=0.9",
+                "Accept-Encoding": "gzip, deflate, br",
+                "Sec-Ch-Ua": '"Chromium";v="131"',
+                "Sec-Ch-Ua-Mobile": "?0",
+                "Sec-Fetch-Dest": "document",
+                "Sec-Fetch-Mode": "navigate",
+                "Sec-Fetch-Site": "none",
+                "Sec-Fetch-User": "?1",
+                "Upgrade-Insecure-Requests": "1",
+                "Referer": "https://www.google.com/",
+                "Cache-Control": "no-cache",
+            }, timeout=REQUEST_TIMEOUT)
+
+            if resp.status_code != 200:
+                return None, None
+
+            # Try JSON-LD first
+            for m in re.finditer(r'<script type="application/ld\+json">(.*?)</script>', resp.text, re.DOTALL):
+                try:
+                    data = json.loads(m.group(1))
+                    items = data if isinstance(data, list) else [data]
+                    for item in items:
+                        if isinstance(item, dict) and 'aggregateRating' in item:
+                            r = item['aggregateRating']
+                            return float(r.get('ratingValue', 0)), int(r.get('reviewCount', 0))
+                except: continue
+
+            # Try __NEXT_DATA__ (Next.js payload)
+            m = re.search(r'<script id="__NEXT_DATA__" type="application/json">(.*?)</script>', resp.text, re.DOTALL)
+            if m:
+                try:
+                    data = json.loads(m.group(1))
+                    text = json.dumps(data)
+                    sm = re.search(r'"trustScore":\s*([\d.]+)', text)
+                    cm = re.search(r'"numberOfReviews":\s*(\d+)', text)
+                    if sm: return float(sm.group(1)), int(cm.group(1)) if cm else 0
+                except: pass
+
+            # Regex fallback
+            sm = re.search(r'TrustScore\s+(\d+\.?\d*)', resp.text)
+            cm = re.search(r'([\d,]+)\s+reviews?', resp.text, re.I)
+            if sm:
+                return float(sm.group(1)), int(cm.group(1).replace(',','')) if cm else 0
+
+            return None, None
+        except Exception as e:
+            log_error(f"TP HTML {domain}: {e}", tag="SCRAPE")
+            return None, None
+
+    def scrape_firm(self, slug, cfg):
+        tp_url = cfg.get("trustpilot")
+        if not tp_url: return
+
+        domain = self._extract_domain(tp_url)
+        if not domain:
+            log_warn(f"Bad TP URL: {tp_url}", tag="SCRAPE")
+            self.results["errors"] += 1
             return
-        score, review_count = self._scrape_trustpilot_page(trustpilot_url)
-        if score is not None:
+
+        score, count = None, None
+
+        # Try methods in order of reliability
+        for method_name, method in [
+            ("API", self._scrape_via_api),
+            ("Widget", self._scrape_via_widget),
+            ("HTML", self._scrape_via_embed),
+        ]:
+            score, count = method(domain)
+            if score is not None and score > 0:
+                log_info(f"✅ {cfg['name']}: ⭐{score}/5 ({count}) via {method_name}", tag="SCRAPE")
+                break
+            time.sleep(1)
+
+        if score is not None and score > 0:
             self.results["scraped"] += 1
-            save_trustpilot_score(firm_slug, score, review_count or 0)
-            log_info(f"Trustpilot {firm_config['name']}: ⭐ {score}/5 ({review_count or '?'} reviews)", tag="SCRAPE")
-            self._check_score_alerts(firm_slug, firm_config['name'], score, review_count)
+            save_trustpilot_score(slug, score, count or 0)
+            self._check_alerts(slug, cfg['name'], score, count)
         else:
             self.results["errors"] += 1
+            log_warn(f"❌ {cfg['name']}: all methods failed for {domain}", tag="SCRAPE")
 
-    def _check_score_alerts(self, firm_slug, firm_name, current_score, current_count):
-        previous_scores = get_latest_trustpilot_scores()
-        previous = previous_scores.get(firm_slug)
-        if previous and previous.get('score'):
-            old_score = previous['score']
-            if current_score < old_score - self.SCORE_DROP_THRESHOLD:
+    def _check_alerts(self, slug, name, score, count):
+        prev = get_latest_trustpilot_scores().get(slug)
+        if prev and prev.get('score'):
+            if score < prev['score'] - self.SCORE_DROP:
                 self.results["score_drops"] += 1
-                save_scam_alert(
-                    firm_slug=firm_slug, alert_type="trustpilot_score_drop",
-                    severity="medium",
-                    description=f"{firm_name} Trustpilot dropped {old_score:.1f} → {current_score:.1f}",
-                    source="Trustpilot monitoring"
-                )
-                log_info(f"📉 Score drop: {firm_name} {old_score:.1f} → {current_score:.1f}", tag="ALERT")
-            if current_count and previous.get('review_count'):
-                new_reviews = current_count - previous['review_count']
-                if new_reviews >= self.NEGATIVE_SPIKE_REVIEWS:
-                    log_info(f"📊 Review spike: {firm_name} +{new_reviews} reviews", tag="ALERT")
-        if current_score < self.LOW_SCORE_THRESHOLD:
+                save_scam_alert(slug, "trustpilot_drop", "medium",
+                    f"{name}: {prev['score']:.1f} → {score:.1f}", "Trustpilot")
+        if score < self.LOW_SCORE:
             self.results["low_scores"] += 1
-            log_info(f"⚠️  Low score: {firm_name} at {current_score:.1f}/5", tag="ALERT")
 
     def scrape_all(self):
-        log_info(f"Starting Trustpilot scrape of {len(PROP_FIRMS)} firms...", tag="SCRAPE")
-        self.results = {"scraped": 0, "score_drops": 0, "low_scores": 0, "errors": 0}
-        for firm_slug, firm_config in PROP_FIRMS.items():
-            try:
-                self.scrape_firm(firm_slug, firm_config)
-            except Exception as e:
-                log_error(f"Trustpilot error {firm_slug}: {e}", tag="SCRAPE")
-                self.results["errors"] += 1
-            time.sleep(random.uniform(3, 6))
-        log_info(
-            f"Trustpilot scrape complete — Scraped: {self.results['scraped']} | "
-            f"Score drops: {self.results['score_drops']} | "
-            f"Low scores: {self.results['low_scores']} | "
-            f"Errors: {self.results['errors']}", tag="SCRAPE"
-        )
+        log_info(f"Trustpilot ({len(PROP_FIRMS)} firms)...", tag="SCRAPE")
+        self.results = {"scraped":0,"score_drops":0,"low_scores":0,"errors":0}
+        for slug, cfg in PROP_FIRMS.items():
+            try: self.scrape_firm(slug, cfg)
+            except Exception as e: log_error(f"TP {slug}: {e}", tag="SCRAPE"); self.results["errors"]+=1
+            time.sleep(random.uniform(2, 5))
+        log_info(f"Trustpilot: {self.results['scraped']}ok {self.results['errors']}err", tag="SCRAPE")
         return self.results
-ENDFILE4
-echo "  ✅ scrapers/trustpilot_scraper.py"
+TPEOF
+echo "  ✅ trustpilot_scraper.py"
 
-# ============================================================
-# FILE 5: services/alert_service.py
-# ============================================================
-cat > services/alert_service.py << 'ENDFILE5'
-"""
-PropFirmTracker Bot - Alert Service
-"""
-import asyncio
-from datetime import datetime, timedelta
-from utils.logger import log_info, log_error, log_warn
-from database import (
-    get_unalerted_changes, mark_change_alerted,
-    get_active_promos, get_all_premium_users
-)
-from config import (
-    FREE_CHANNEL_ID, PREMIUM_CHANNEL_ID,
-    FREE_ALERT_DELAY_HOURS, PROP_FIRMS
-)
-
-
-class AlertService:
-    def __init__(self, bot_app):
-        self.bot = bot_app.bot if bot_app else None
-        self._channel_disabled = set()
-
-    def set_bot(self, bot):
-        self.bot = bot
-
-    def _is_channel_configured(self, channel_id):
-        if not channel_id:
-            return False
-        if str(channel_id) in ("-100XXXXXXXXXX", "", "0"):
-            return False
-        if channel_id in self._channel_disabled:
-            return False
-        return True
-
-    def _get_affiliate_link(self, firm_slug):
-        firm = PROP_FIRMS.get(firm_slug, {})
-        return firm.get("affiliate_url", firm.get("url", "#"))
-
-    def _get_firm_name(self, firm_slug):
-        firm = PROP_FIRMS.get(firm_slug, {})
-        return firm.get("name", firm_slug.replace("_", " ").title())
-
-    def format_change_alert(self, change, is_premium=True):
-        firm_name = self._get_firm_name(change['firm_slug'])
-        affiliate_link = self._get_affiliate_link(change['firm_slug'])
-        type_emojis = {
-            "content_update": "🔄", "pricing_change": "💰", "rules_change": "📋",
-            "new_promo": "🎟️", "scam_alert": "🚨", "trustpilot_drop": "📉",
-        }
-        emoji = type_emojis.get(change.get('change_type', ''), '🔔')
-        msg = f"{emoji} <b>{firm_name} — Update Detected</b>\n\n"
-        msg += f"📄 Page: <code>{change.get('page_type', 'unknown')}</code>\n"
-        msg += f"📝 {change.get('summary', 'Change detected')}\n"
-        if change.get('ai_analysis'):
-            msg += f"\n🧠 <b>AI Analysis:</b>\n{change['ai_analysis']}\n"
-        msg += f"\n🕐 Detected: {change.get('detected_at', 'now')}\n"
-        if is_premium:
-            msg += f"\n🔗 <a href='{affiliate_link}'>Visit {firm_name}</a>"
-        else:
-            msg += f"\n⏳ <i>Premium members got this alert {FREE_ALERT_DELAY_HOURS}h ago</i>"
-            msg += "\n\n💎 Upgrade to Premium: /premium"
-        msg += "\n\n━━━━━━━━━━━━━━━━━━━━━\n🤖 @PropFirmTrackerBot"
-        return msg
-
-    def format_promo_alert(self, promo, is_premium=True):
-        firm_name = self._get_firm_name(promo['firm_slug'])
-        affiliate_link = self._get_affiliate_link(promo['firm_slug'])
-        msg = f"🎟️ <b>NEW PROMO — {firm_name}</b>\n\n"
-        msg += f"💰 Discount: <b>{promo.get('discount', 'See details')}</b>\n"
-        if promo.get('promo_code'):
-            msg += f"🔑 Code: <code>{promo['promo_code']}</code>\n"
-        if promo.get('description'):
-            msg += f"📝 {promo['description']}\n"
-        if promo.get('expires_at'):
-            msg += f"⏰ Expires: {promo['expires_at']}\n"
-        msg += f"\n🔗 <a href='{affiliate_link}'>Claim at {firm_name} →</a>"
-        if not is_premium:
-            msg += f"\n\n⏳ <i>Premium members got this {FREE_ALERT_DELAY_HOURS}h earlier</i>"
-            msg += "\n💎 /premium for real-time alerts"
-        msg += "\n\n━━━━━━━━━━━━━━━━━━━━━\n🤖 @PropFirmTrackerBot"
-        return msg
-
-    def format_scam_alert(self, alert, is_premium=True):
-        firm_name = self._get_firm_name(alert['firm_slug'])
-        severity_emojis = {"high": "🚨", "medium": "⚠️", "low": "ℹ️"}
-        emoji = severity_emojis.get(alert.get('severity', 'medium'), '⚠️')
-        msg = f"{emoji} <b>WARNING — {firm_name}</b>\n\n"
-        msg += f"📊 Severity: <b>{alert.get('severity', 'medium').upper()}</b>\n"
-        msg += f"📝 {alert.get('description', 'Issue detected')}\n"
-        if alert.get('source'):
-            msg += f"📎 Source: {alert['source']}\n"
-        msg += f"\n🕐 Detected: {alert.get('detected_at', 'now')}\n"
-        msg += "\n⚡ <i>Always do your own due diligence before choosing a prop firm.</i>"
-        if not is_premium:
-            msg += "\n\n💎 /premium for instant scam alerts"
-        msg += "\n\n━━━━━━━━━━━━━━━━━━━━━\n🤖 @PropFirmTrackerBot"
-        return msg
-
-    async def _send_to_channel(self, channel_id, text):
-        try:
-            await self.bot.send_message(
-                chat_id=channel_id, text=text,
-                parse_mode='HTML', disable_web_page_preview=True
-            )
-            return True
-        except Exception as e:
-            err = str(e).lower()
-            if 'chat not found' in err or 'chat_not_found' in err:
-                self._channel_disabled.add(channel_id)
-                log_warn(f"Channel {channel_id} not found — alerts disabled. Fix PREMIUM_CHANNEL_ID or FREE_CHANNEL_ID in .env", tag="ALERT")
-                return False
-            elif 'forbidden' in err:
-                self._channel_disabled.add(channel_id)
-                log_warn(f"Bot not admin in {channel_id} — alerts disabled", tag="ALERT")
-                return False
-            else:
-                log_error(f"Send failed: {e}", tag="ALERT")
-                return False
-
-    async def send_premium_alerts(self):
-        if not self.bot:
-            return
-        if not self._is_channel_configured(PREMIUM_CHANNEL_ID):
-            changes = get_unalerted_changes("premium")
-            if changes:
-                log_warn(f"Skipping {len(changes)} premium alerts — PREMIUM_CHANNEL_ID not set in .env", tag="ALERT")
-                for c in changes:
-                    mark_change_alerted(c['id'], "premium")
-            return
-        changes = get_unalerted_changes("premium")
-        if not changes:
-            log_info("No new premium alerts to send", tag="ALERT")
-            return
-        log_info(f"Sending {len(changes)} alerts to premium channel...", tag="ALERT")
-        sent = 0
-        for change in changes:
-            msg = self.format_change_alert(change, is_premium=True)
-            success = await self._send_to_channel(PREMIUM_CHANNEL_ID, msg)
-            if success:
-                sent += 1
-            elif PREMIUM_CHANNEL_ID in self._channel_disabled:
-                for c in changes:
-                    mark_change_alerted(c['id'], "premium")
-                break
-            mark_change_alerted(change['id'], "premium")
-            await asyncio.sleep(1)
-        if sent > 0:
-            log_info(f"Alerts sent ✓ ({sent}/{len(changes)})", tag="ALERT")
-
-    async def send_free_alerts(self):
-        if not self.bot:
-            return
-        if not self._is_channel_configured(FREE_CHANNEL_ID):
-            changes = get_unalerted_changes("free")
-            if changes:
-                for c in changes:
-                    detected = datetime.fromisoformat(c['detected_at'])
-                    if detected <= datetime.now() - timedelta(hours=FREE_ALERT_DELAY_HOURS):
-                        mark_change_alerted(c['id'], "free")
-            return
-        changes = get_unalerted_changes("free")
-        if not changes:
-            return
-        delay_cutoff = datetime.now() - timedelta(hours=FREE_ALERT_DELAY_HOURS)
-        for change in changes:
-            detected = datetime.fromisoformat(change['detected_at'])
-            if detected <= delay_cutoff:
-                msg = self.format_change_alert(change, is_premium=False)
-                success = await self._send_to_channel(FREE_CHANNEL_ID, msg)
-                if not success and FREE_CHANNEL_ID in self._channel_disabled:
-                    for c in changes:
-                        mark_change_alerted(c['id'], "free")
-                    break
-                mark_change_alerted(change['id'], "free")
-                await asyncio.sleep(1)
-
-    async def send_promo_to_channel(self, promo, channel_type="premium"):
-        if not self.bot:
-            return
-        channel_id = PREMIUM_CHANNEL_ID if channel_type == "premium" else FREE_CHANNEL_ID
-        is_premium = channel_type == "premium"
-        if not self._is_channel_configured(channel_id):
-            return
-        msg = self.format_promo_alert(promo, is_premium=is_premium)
-        success = await self._send_to_channel(channel_id, msg)
-        if success:
-            log_info(f"Promo sent to {channel_type}: {promo['firm_slug']}", tag="ALERT")
-ENDFILE5
-echo "  ✅ services/alert_service.py"
-
-# ============================================================
-# DONE — Verify
-# ============================================================
+# ═══════════════════════════════
+# CLEAR old garbage alerts from DB
+# ═══════════════════════════════
 echo ""
-echo "🔍 Verifying files..."
+echo "🗑️  Clearing old garbage alerts..."
 python3 -c "
-from config import PROP_FIRMS
-print(f'  Config OK — {len(PROP_FIRMS)} firms loaded')
-for slug, cfg in PROP_FIRMS.items():
-    urls = [cfg.get('pricing_url',''), cfg.get('rules_url',''), cfg.get('url','')]
-    active = sum(1 for u in urls if u)
-    print(f'    {slug}: {active} active URLs')
+import sqlite3, os
+db = 'data/propfirm_tracker.db'
+if os.path.exists(db):
+    conn = sqlite3.connect(db)
+    # Mark ALL old alerts as sent
+    conn.execute('UPDATE changes SET alerted_premium=1, alerted_free=1')
+    conn.commit()
+    n = conn.execute('SELECT COUNT(*) FROM changes').fetchone()[0]
+    conn.close()
+    print(f'  ✅ {n} old alerts cleared')
+else:
+    print('  Fresh DB')
 "
 
+# ═══════════════════════════════
+# VERIFY
+# ═══════════════════════════════
 echo ""
-echo "✅ ALL 5 FILES FIXED — Run: python3 run.py"
+echo "🔍 Verifying..."
+python3 -m py_compile scrapers/prop_firms.py && echo "  ✅ prop_firms.py OK"
+python3 -m py_compile scrapers/trustpilot_scraper.py && echo "  ✅ trustpilot_scraper.py OK"
+
+echo ""
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "✅ V3.2 Done!"
+echo ""
+echo "Start: python3 run.py"
+echo ""
+echo "Fixed:"
+echo "  ✅ Diff: garbage chars filtered (only readable text)"
+echo "  ✅ Diff: clean summary format (no binary/encoded data)"
+echo "  ✅ Trustpilot: 3 methods (API → Widget → HTML)"
+echo "  ✅ Old garbage alerts cleared"
+echo ""
+echo "VIP alerts will now show:"
+echo "  💰 Pricing Update"
+echo "  Values: \$499 → \$449"
+echo "  'profit split' section modified"
+echo "  New: Get 20% off all challenges..."
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
