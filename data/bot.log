@@ -1,0 +1,128 @@
+2026-02-08 12:52:06 | [2m12:52:06[0m [1m[92m[🚀 STARTUP][0m Starting PropFirmTracker Bot...
+2026-02-08 12:52:06 | [2m12:52:06[0m [1m[92m[🚀 STARTUP][0m Setting up database...
+2026-02-08 12:52:06 | [2m12:52:06[0m [2m[97m[💾 DB][0m Initializing database...
+2026-02-08 12:52:06 | [2m12:52:06[0m [2m[97m[💾 DB][0m Database initialized successfully ✓
+2026-02-08 12:52:06 | [2m12:52:06[0m [1m[92m[🚀 STARTUP][0m Setting up Telegram bot...
+2026-02-08 12:52:06 | [2m12:52:06[0m [1m[92m[🚀 STARTUP][0m Creating bot application...
+2026-02-08 12:52:06 | [2m12:52:06[0m [1m[92m[🚀 STARTUP][0m Bot handlers registered ✓
+2026-02-08 12:52:06 | [2m12:52:06[0m [1m[92m[🚀 STARTUP][0m Starting polling...
+2026-02-08 12:52:09 | [2m12:52:09[0m [1m[96m[🤖 BOT][0m Bot commands registered ✓
+2026-02-08 12:52:09 | [2m12:52:09[0m [1m[92m[🚀 STARTUP][0m Scheduler background task started ✓
+2026-02-08 12:52:09 | [2m12:52:09[0m [1m[92m[🚀 STARTUP][0m ═══════════════════════════════════════
+2026-02-08 12:52:09 | [2m12:52:09[0m [1m[92m[🚀 STARTUP][0m 🚀 PropFirmTracker Bot is LIVE!
+2026-02-08 12:52:09 | [2m12:52:09[0m [1m[92m[🚀 STARTUP][0m ═══════════════════════════════════════
+2026-02-08 12:52:09 | [2m12:52:09[0m [1m[92m[🚀 STARTUP][0m Scheduler started — scraping every 3h
+2026-02-08 12:52:39 | [2m12:52:39[0m [96m[🔍 SCRAPE][0m ═══ Starting scrape cycle at 12:52:39 ═══
+2026-02-08 12:52:39 | [2m12:52:39[0m [96m[🔍 SCRAPE][0m Starting full scrape of 10 prop firms...
+2026-02-08 12:52:39 | [2m12:52:39[0m [96m[🔍 SCRAPE][0m Scraping FTMO...
+2026-02-08 12:52:41 | [2m12:52:41[0m [96m[🔍 SCRAPE][0m Failed to fetch https://ftmo.com/en/pricing/: 404 Client Error: Not Found for url: https://ftmo.com/en/pricing/
+2026-02-08 12:52:42 | [2m12:52:42[0m [97m[📌 DIFF][0m Change recorded: ftmo - content_update
+2026-02-08 12:52:44 | [2m12:52:44[0m [97m[📌 DIFF][0m Change recorded: ftmo - content_update
+2026-02-08 12:52:44 | [2m12:52:44[0m [93m[🔔 ALERT][0m New promo detected: ftmo - DURING (Unknown)
+2026-02-08 12:52:44 | [2m12:52:44[0m [96m[🔍 SCRAPE][0m 🎟️  New promo found: ftmo — DURING ()
+2026-02-08 12:52:44 | [2m12:52:44[0m [93m[🔔 ALERT][0m New promo detected: ftmo - CUSTOMER (Unknown)
+2026-02-08 12:52:44 | [2m12:52:44[0m [96m[🔍 SCRAPE][0m 🎟️  New promo found: ftmo — CUSTOMER ()
+2026-02-08 12:52:46 | [2m12:52:46[0m [97m[📌 DIFF][0m Change recorded: ftmo - content_update
+2026-02-08 12:52:49 | [2m12:52:49[0m [96m[🔍 SCRAPE][0m Scraping Funded Next...
+2026-02-08 12:52:51 | [2m12:52:51[0m [96m[🔍 SCRAPE][0m Failed to fetch https://fundednext.com/pricing/: 404 Client Error: Not Found for url: https://fundednext.com/pricing
+2026-02-08 12:52:52 | [2m12:52:52[0m [97m[📌 DIFF][0m Change recorded: fundednext - content_update
+2026-02-08 12:52:54 | [2m12:52:54[0m [97m[📌 DIFF][0m Change recorded: fundednext - content_update
+2026-02-08 12:52:54 | [2m12:52:54[0m [93m[🔔 ALERT][0m New promo detected: fundednext - TECHNOLOGY (Unknown)
+2026-02-08 12:52:54 | [2m12:52:54[0m [96m[🔍 SCRAPE][0m 🎟️  New promo found: fundednext — TECHNOLOGY ()
+2026-02-08 12:52:59 | [2m12:52:59[0m [97m[📌 DIFF][0m Change recorded: fundednext - content_update
+2026-02-08 12:53:02 | [2m12:53:02[0m [96m[🔍 SCRAPE][0m Scraping The 5%ers...
+2026-02-08 12:53:02 | [2m12:53:02[0m [96m[🔍 SCRAPE][0m Failed to fetch https://the5ers.com/pricing/: 404 Client Error: Not Found for url: https://the5ers.com/pricing/
+2026-02-08 12:53:02 | [2m12:53:02[0m [96m[🔍 SCRAPE][0m Failed to fetch https://the5ers.com/trading-rules/: 404 Client Error: Not Found for url: https://the5ers.com/trading-rules/
+2026-02-08 12:53:02 | [2m12:53:02[0m [97m[📌 DIFF][0m Change recorded: the5ers - content_update
+2026-02-08 12:53:03 | [2m12:53:03[0m [97m[📌 DIFF][0m Change recorded: the5ers - content_update
+2026-02-08 12:53:06 | [2m12:53:06[0m [96m[🔍 SCRAPE][0m Scraping MyFundedFX...
+2026-02-08 12:53:07 | [2m12:53:07[0m [97m[📌 DIFF][0m Change recorded: myfundedfx - content_update
+2026-02-08 12:53:08 | [2m12:53:08[0m [97m[📌 DIFF][0m Change recorded: myfundedfx - content_update
+2026-02-08 12:53:10 | [2m12:53:10[0m [97m[📌 DIFF][0m Change recorded: myfundedfx - content_update
+2026-02-08 12:53:11 | [2m12:53:11[0m [97m[📌 DIFF][0m Change recorded: myfundedfx - content_update
+2026-02-08 12:53:14 | [2m12:53:14[0m [96m[🔍 SCRAPE][0m Scraping TopStep...
+2026-02-08 12:53:15 | [2m12:53:15[0m [96m[🔍 SCRAPE][0m Failed to fetch https://www.topstep.com/pricing/: 404 Client Error: Not Found for url: https://www.topstep.com/pricing/
+2026-02-08 12:53:16 | [2m12:53:16[0m [97m[📌 DIFF][0m Change recorded: topstep - content_update
+2026-02-08 12:53:18 | [2m12:53:18[0m [97m[📌 DIFF][0m Change recorded: topstep - content_update
+2026-02-08 12:53:19 | [2m12:53:19[0m [97m[📌 DIFF][0m Change recorded: topstep - content_update
+2026-02-08 12:53:22 | [2m12:53:22[0m [96m[🔍 SCRAPE][0m Scraping Apex Trader Funding...
+2026-02-08 12:53:22 | [2m12:53:22[0m [96m[🔍 SCRAPE][0m Failed to fetch https://apextraderfunding.com/pricing/: 403 Client Error: Forbidden for url: https://apextraderfunding.com/pricing/
+2026-02-08 12:53:22 | [2m12:53:22[0m [96m[🔍 SCRAPE][0m Failed to fetch https://apextraderfunding.com/rules/: 403 Client Error: Forbidden for url: https://apextraderfunding.com/rules/
+2026-02-08 12:53:22 | [2m12:53:22[0m [96m[🔍 SCRAPE][0m Failed to fetch https://apextraderfunding.com: 403 Client Error: Forbidden for url: https://apextraderfunding.com/
+2026-02-08 12:53:22 | [2m12:53:22[0m [96m[🔍 SCRAPE][0m Failed to fetch https://apextraderfunding.com/blog/: 403 Client Error: Forbidden for url: https://apextraderfunding.com/blog/
+2026-02-08 12:53:24 | [2m12:53:24[0m [96m[🔍 SCRAPE][0m Scraping E8 Funding...
+2026-02-08 12:53:25 | [2m12:53:25[0m [96m[🔍 SCRAPE][0m Failed to fetch https://e8funding.com/pricing/: 403 Client Error: Forbidden for url: https://e8markets.com/pricing/
+2026-02-08 12:53:25 | [2m12:53:25[0m [96m[🔍 SCRAPE][0m Failed to fetch https://e8funding.com/rules/: 403 Client Error: Forbidden for url: https://e8markets.com/rules/
+2026-02-08 12:53:25 | [2m12:53:25[0m [96m[🔍 SCRAPE][0m Failed to fetch https://e8funding.com: 403 Client Error: Forbidden for url: https://e8markets.com/
+2026-02-08 12:53:25 | [2m12:53:25[0m [96m[🔍 SCRAPE][0m Failed to fetch https://e8funding.com/blog/: 403 Client Error: Forbidden for url: https://e8markets.com/blog/
+2026-02-08 12:53:27 | [2m12:53:27[0m [96m[🔍 SCRAPE][0m Scraping Funding Pips...
+2026-02-08 12:53:28 | [2m12:53:28[0m [96m[🔍 SCRAPE][0m Failed to fetch https://fundingpips.com/pricing/: 404 Client Error: Not Found for url: https://www.fundingpips.com/en/pricing
+2026-02-08 12:53:28 | [2m12:53:28[0m [96m[🔍 SCRAPE][0m Failed to fetch https://fundingpips.com/rules/: 404 Client Error: Not Found for url: https://www.fundingpips.com/en/rules
+2026-02-08 12:53:28 | [2m12:53:28[0m [97m[📌 DIFF][0m Change recorded: fundingpips - content_update
+2026-02-08 12:53:30 | [2m12:53:30[0m [97m[📌 DIFF][0m Change recorded: fundingpips - content_update
+2026-02-08 12:53:33 | [2m12:53:33[0m [96m[🔍 SCRAPE][0m Scraping Goat Funded Trader...
+2026-02-08 12:53:34 | [2m12:53:34[0m [96m[🔍 SCRAPE][0m Failed to fetch https://goatfundedtrader.com/pricing/: 404 Client Error: Not Found for url: https://www.goatfundedtrader.com/pricing
+2026-02-08 12:53:34 | [2m12:53:34[0m [96m[🔍 SCRAPE][0m Failed to fetch https://goatfundedtrader.com/rules/: 404 Client Error: Not Found for url: https://www.goatfundedtrader.com/rules
+2026-02-08 12:53:35 | [2m12:53:35[0m [97m[📌 DIFF][0m Change recorded: goatfunded - content_update
+2026-02-08 12:53:35 | [2m12:53:35[0m [93m[🔔 ALERT][0m New promo detected: goatfunded - TECHNOLOGY (35% OFF)
+2026-02-08 12:53:35 | [2m12:53:35[0m [96m[🔍 SCRAPE][0m 🎟️  New promo found: goatfunded — TECHNOLOGY (35% OFF)
+2026-02-08 12:53:35 | [2m12:53:35[0m [93m[🔔 ALERT][0m New promo detected: goatfunded - FIRSTGFT (35% OFF)
+2026-02-08 12:53:35 | [2m12:53:35[0m [96m[🔍 SCRAPE][0m 🎟️  New promo found: goatfunded — FIRSTGFT (35% OFF)
+2026-02-08 12:53:35 | [2m12:53:35[0m [93m[🔔 ALERT][0m New promo detected: goatfunded - BOGO35 (35% OFF)
+2026-02-08 12:53:35 | [2m12:53:35[0m [96m[🔍 SCRAPE][0m 🎟️  New promo found: goatfunded — BOGO35 (35% OFF)
+2026-02-08 12:53:36 | [2m12:53:36[0m [97m[📌 DIFF][0m Change recorded: goatfunded - content_update
+2026-02-08 12:53:39 | [2m12:53:39[0m [96m[🔍 SCRAPE][0m Scraping Blueberry Funded...
+2026-02-08 12:53:40 | [2m12:53:40[0m [96m[🔍 SCRAPE][0m Failed to fetch https://blueberryfunded.com/pricing/: 404 Client Error: Not Found for url: https://blueberryfunded.com/pricing/
+2026-02-08 12:53:42 | [2m12:53:42[0m [96m[🔍 SCRAPE][0m Failed to fetch https://blueberryfunded.com/rules/: 404 Client Error: Not Found for url: https://blueberryfunded.com/rules/
+2026-02-08 12:53:42 | [2m12:53:42[0m [97m[📌 DIFF][0m Change recorded: blueberry_funded - content_update
+2026-02-08 12:53:42 | [2m12:53:42[0m [93m[🔔 ALERT][0m New promo detected: blueberry_funded - BERRY15 (15% OFF)
+2026-02-08 12:53:42 | [2m12:53:42[0m [96m[🔍 SCRAPE][0m 🎟️  New promo found: blueberry_funded — BERRY15 (15% OFF)
+2026-02-08 12:53:44 | [2m12:53:44[0m [97m[📌 DIFF][0m Change recorded: blueberry_funded - content_update
+2026-02-08 12:53:47 | [2m12:53:47[0m [96m[🔍 SCRAPE][0m Scrape complete — Pages: 21 | Changes: 21 | Promos: 7 | Errors: 19
+2026-02-08 12:53:47 | [2m12:53:47[0m [96m[🔍 SCRAPE][0m Prop firms done: {'scraped': 21, 'changes': 21, 'errors': 19, 'promos': 7}
+2026-02-08 12:53:47 | [2m12:53:47[0m [96m[🔍 SCRAPE][0m Starting Reddit scrape of 4 subreddits...
+2026-02-08 12:53:47 | [2m12:53:47[0m [96m[🔍 SCRAPE][0m Scraping r/FundedTrading...
+2026-02-08 12:53:48 | [2m12:53:48[0m [96m[🔍 SCRAPE][0m Failed to fetch r/FundedTrading: 403 Client Error: Blocked for url: https://old.reddit.com/r/FundedTrading/new.json?limit=25
+2026-02-08 12:53:50 | [2m12:53:50[0m [96m[🔍 SCRAPE][0m Scraping r/proptrading...
+2026-02-08 12:53:50 | [2m12:53:50[0m [96m[🔍 SCRAPE][0m Failed to fetch r/proptrading: 403 Client Error: Blocked for url: https://old.reddit.com/r/proptrading/new.json?limit=25
+2026-02-08 12:53:52 | [2m12:53:52[0m [96m[🔍 SCRAPE][0m Scraping r/Forex...
+2026-02-08 12:53:52 | [2m12:53:52[0m [96m[🔍 SCRAPE][0m Failed to fetch r/Forex: 403 Client Error: Blocked for url: https://old.reddit.com/r/Forex/new.json?limit=25
+2026-02-08 12:53:54 | [2m12:53:54[0m [96m[🔍 SCRAPE][0m Scraping r/FuturesTrading...
+2026-02-08 12:53:54 | [2m12:53:54[0m [96m[🔍 SCRAPE][0m Failed to fetch r/FuturesTrading: 403 Client Error: Blocked for url: https://old.reddit.com/r/FuturesTrading/new.json?limit=25
+2026-02-08 12:53:56 | [2m12:53:56[0m [96m[🔍 SCRAPE][0m Reddit scrape complete — Posts: 0 | Mentions: 0 | Scam alerts: 0 | Errors: 4
+2026-02-08 12:53:56 | [2m12:53:56[0m [96m[🔍 SCRAPE][0m Reddit done: {'posts_found': 0, 'mentions': 0, 'scam_alerts': 0, 'errors': 4}
+2026-02-08 12:53:56 | [2m12:53:56[0m [96m[🔍 SCRAPE][0m Starting Trustpilot scrape of 10 firms...
+2026-02-08 12:54:31 | [2m12:54:31[0m [96m[🔍 SCRAPE][0m Trustpilot scrape complete — Scraped: 0 | Score drops: 0 | Low scores: 0 | Errors: 10
+2026-02-08 12:54:31 | [2m12:54:31[0m [96m[🔍 SCRAPE][0m Trustpilot done: {'scraped': 0, 'score_drops': 0, 'low_scores': 0, 'errors': 10}
+2026-02-08 12:54:31 | [2m12:54:31[0m [93m[🔔 ALERT][0m Sending 21 alerts to premium channel...
+2026-02-08 12:54:31 | [2m12:54:31[0m [1m[96m[🤖 BOT][0m New user registered: 909302789 (@Ox00n4)
+2026-02-08 12:54:32 | [2m12:54:32[0m [93m[🔔 ALERT][0m Failed to send premium alert: Chat not found
+2026-02-08 12:54:32 | [2m12:54:32[0m [1m[96m[🤖 BOT][0m User started bot: 909302789 (@Ox00n4)
+2026-02-08 12:54:32 | [2m12:54:32[0m [93m[🔔 ALERT][0m Failed to send premium alert: Chat not found
+2026-02-08 12:54:32 | [2m12:54:32[0m [93m[🔔 ALERT][0m Failed to send premium alert: Chat not found
+2026-02-08 12:54:32 | [2m12:54:32[0m [1m[96m[🤖 BOT][0m User started bot: 909302789 (@Ox00n4)
+2026-02-08 12:54:32 | [2m12:54:32[0m [93m[🔔 ALERT][0m Failed to send premium alert: Chat not found
+2026-02-08 12:54:32 | [2m12:54:32[0m [93m[🔔 ALERT][0m Failed to send premium alert: Chat not found
+2026-02-08 12:54:32 | [2m12:54:32[0m [93m[🔔 ALERT][0m Failed to send premium alert: Chat not found
+2026-02-08 12:54:32 | [2m12:54:32[0m [93m[🔔 ALERT][0m Failed to send premium alert: Chat not found
+2026-02-08 12:54:32 | [2m12:54:32[0m [93m[🔔 ALERT][0m Failed to send premium alert: Chat not found
+2026-02-08 12:54:32 | [2m12:54:32[0m [93m[🔔 ALERT][0m Failed to send premium alert: Chat not found
+2026-02-08 12:54:32 | [2m12:54:32[0m [93m[🔔 ALERT][0m Failed to send premium alert: Chat not found
+2026-02-08 12:54:32 | [2m12:54:32[0m [93m[🔔 ALERT][0m Failed to send premium alert: Chat not found
+2026-02-08 12:54:32 | [2m12:54:32[0m [93m[🔔 ALERT][0m Failed to send premium alert: Chat not found
+2026-02-08 12:54:32 | [2m12:54:32[0m [93m[🔔 ALERT][0m Failed to send premium alert: Chat not found
+2026-02-08 12:54:32 | [2m12:54:32[0m [93m[🔔 ALERT][0m Failed to send premium alert: Chat not found
+2026-02-08 12:54:32 | [2m12:54:32[0m [93m[🔔 ALERT][0m Failed to send premium alert: Chat not found
+2026-02-08 12:54:32 | [2m12:54:32[0m [93m[🔔 ALERT][0m Failed to send premium alert: Chat not found
+2026-02-08 12:54:33 | [2m12:54:33[0m [93m[🔔 ALERT][0m Failed to send premium alert: Chat not found
+2026-02-08 12:54:33 | [2m12:54:33[0m [93m[🔔 ALERT][0m Failed to send premium alert: Chat not found
+2026-02-08 12:54:33 | [2m12:54:33[0m [93m[🔔 ALERT][0m Failed to send premium alert: Chat not found
+2026-02-08 12:54:33 | [2m12:54:33[0m [93m[🔔 ALERT][0m Failed to send premium alert: Chat not found
+2026-02-08 12:54:33 | [2m12:54:33[0m [93m[🔔 ALERT][0m Failed to send premium alert: Chat not found
+2026-02-08 12:54:33 | [2m12:54:33[0m [93m[🔔 ALERT][0m Alerts sent ✓
+2026-02-08 12:54:33 | [2m12:54:33[0m [96m[🔍 SCRAPE][0m ═══ Scrape cycle complete ═══
+2026-02-08 12:54:33 | [2m12:54:33[0m [96m[🔍 SCRAPE][0m Next scrape in 3h...
+2026-02-08 12:54:49 | [2m12:54:49[0m [1m[96m[🤖 BOT][0m User started bot: 909302789 (@Ox00n4)
+2026-02-08 12:55:04 | [2m12:55:04[0m [1m[96m[🤖 BOT][0m User started bot: 909302789 (@Ox00n4)
+2026-02-08 12:59:01 | [2m12:59:01[0m [1m[92m[🚀 STARTUP][0m Scheduler stopped
+2026-02-08 12:59:01 | [2m12:59:01[0m [1m[92m[🚀 STARTUP][0m Bot shutting down...
