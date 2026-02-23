@@ -1,385 +1,259 @@
-# 🏆 PropFirmTracker Bot v1.0
+<p align="center">
+  <img src="assets/banner.svg" alt="PropFirm Tracker Bot" width="900">
+</p>
 
-> **Real-time prop firm monitoring for traders** — Track rule changes, pricing, promos, scams & Trustpilot scores across 10+ prop firms. 24/7 automated. Revenue-generating.
+<p align="center">
+  <strong>Real-time Telegram bot monitoring 10+ prop firms — rule changes, pricing, promos, scam alerts, Trustpilot scores.</strong>
+</p>
 
----
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-575ECF?style=flat-square" alt="License: MIT"></a>
+  <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/Python-3.10%2B-575ECF?style=flat-square&logo=python&logoColor=white" alt="Python 3.10+"></a>
+  <img src="https://img.shields.io/badge/Firms-10%2B%20Monitored-575ECF?style=flat-square" alt="10+ Firms">
+  <a href="https://github.com/SoCloseSociety/PropFirmTrackerBot-/stargazers"><img src="https://img.shields.io/github/stars/SoCloseSociety/PropFirmTrackerBot-?style=flat-square&color=575ECF" alt="Stars"></a>
+  <a href="https://github.com/SoCloseSociety/PropFirmTrackerBot-/issues"><img src="https://img.shields.io/github/issues/SoCloseSociety/PropFirmTrackerBot-?style=flat-square&color=575ECF" alt="Issues"></a>
+</p>
 
-## 📋 Table of Contents
-
-- [Features](#-features)
-- [Revenue Model](#-revenue-model)
-- [Architecture](#-architecture)
-- [Quick Start](#-quick-start)
-- [VPS Deployment](#-vps-deployment)
-- [Configuration](#-configuration)
-- [Bot Commands](#-bot-commands)
-- [Adding New Firms](#-adding-new-firms)
-- [Affiliate Setup](#-affiliate-setup)
-- [Launch Strategy](#-launch-strategy)
-- [Cost Breakdown](#-cost-breakdown)
-
----
-
-## ✨ Features
-
-### Scraping Engine
-- **Prop Firm Websites** — Monitors pricing, rules, homepage, and blog pages for 10+ firms
-- **Reddit** — Scans r/FundedTrading, r/PropFirm, r/Forex for mentions, scam reports, sentiment
-- **Trustpilot** — Tracks rating scores and review counts; alerts on significant drops
-- **Promo Detection** — Automatically finds promo codes and discount offers on firm pages
-
-### Alert System
-- **Dual Channel** — Free (24h delay) + Premium (real-time) alerts
-- **AI-Powered Summaries** — Uses Claude Haiku to explain what changed and how it impacts traders
-- **Scam Detection** — Flags suspicious activity, negative review spikes, payout issues
-
-### Monetization
-- **Premium Subscriptions** — $14.99/month or $119.99/year
-- **Referral Program** — Invite 3 friends = 7 days free premium (viral growth)
-- **Affiliate Links** — Earn 10-20% commission from prop firm referrals (passive income!)
-- **Payment Methods** — Crypto (USDT), Stripe (cards), Telegram Stars
-
-### Admin Tools
-- `/stats` — Live dashboard (users, revenue, data)
-- `/activate [user_id] [days]` — Manual premium activation
-- `/broadcast [message]` — Message all users
-- `/scrape` — Trigger manual scrape cycle
+<p align="center">
+  <a href="#quick-start">Quick Start</a> &bull;
+  <a href="#key-features">Features</a> &bull;
+  <a href="#monitored-firms">Firms</a> &bull;
+  <a href="#faq">FAQ</a> &bull;
+  <a href="#contributing">Contributing</a>
+</p>
 
 ---
 
-## 💰 Revenue Model
+## What is PropFirm Tracker Bot?
 
-```
-┌─────────────────────────────────────────────────────┐
-│                   REVENUE STREAMS                    │
-├─────────────────────────────────────────────────────┤
-│                                                      │
-│  1. PREMIUM SUBS      $14.99/mo × subscribers       │
-│     └── Target: 100 subs = $1,499/mo                │
-│                                                      │
-│  2. AFFILIATE LINKS    10-20% per challenge sold    │
-│     └── FTMO $100K challenge = ~$80 commission      │
-│     └── Even free users click these → passive $$$   │
-│                                                      │
-│  3. REFERRAL VIRALITY  Users promote for you (free) │
-│     └── 3 invites = 7 days premium                  │
-│     └── Exponential growth at zero cost              │
-│                                                      │
-│  Monthly target (Month 6):                           │
-│  • 300 premium × $14.99 = $4,497                    │
-│  • Affiliate: ~$1,000-2,000                          │
-│  • Total: $5,500-6,500/mo                            │
-│                                                      │
-│  Costs: ~$10-15/mo  →  ROI: 400-600x               │
-│                                                      │
-└─────────────────────────────────────────────────────┘
-```
+**PropFirm Tracker Bot** is a free, open-source Telegram bot that monitors proprietary trading firms in real-time. It scrapes firm websites for rule changes, pricing updates, and promotional codes, tracks Trustpilot ratings, scans Reddit for scam alerts, and delivers AI-powered summaries — all automatically.
+
+Built for traders who need to stay ahead of prop firm changes without manually checking 10+ websites daily.
+
+### Who is this for?
+
+- **Prop Firm Traders** who want real-time alerts on rule changes
+- **Trading Communities** looking for a monitoring tool for their Telegram group
+- **Content Creators** covering prop firm news
+- **Developers** interested in web scraping + Telegram bots + AI integration
+
+### Key Features
+
+- **10+ Firms Monitored** — FTMO, Funded Next, The 5%ers, MyFundedFX, TopStep, Apex, E8, Funding Pips, Goat Funded, Blueberry Funded
+- **Rule Change Detection** — Alerts when firms update their rules or pricing
+- **Promo Code Scraping** — Automatically discovers discount codes
+- **Trustpilot Tracking** — Monitors ratings and alerts on score drops
+- **Reddit Scam Scanner** — Scans trading subreddits for scam reports
+- **AI Summaries** — Claude Haiku analyzes changes and their impact on traders
+- **Premium/Free Tiers** — Free alerts (24h delay) + premium (real-time)
+- **Referral System** — Users earn premium days by inviting others
+- **Admin Dashboard** — User stats, revenue tracking, manual controls
+- **VPS Deployment** — systemd service with auto-restart
 
 ---
 
-## 🏗 Architecture
-
-```
-prop-firm-tracker/
-├── run.py                  # Main entry point
-├── config.py               # All configuration & firm list
-├── database.py             # SQLite DB (users, subs, data)
-├── bot.py                  # Telegram bot (commands, callbacks)
-├── scheduler.py            # Cron-like scheduler for scrapers
-├── scrapers/
-│   ├── prop_firms.py       # Website scraper + promo detection
-│   ├── reddit_scraper.py   # Reddit mentions + scam detection
-│   └── trustpilot_scraper.py # Rating tracker
-├── services/
-│   ├── alert_service.py    # Alert formatting & delivery
-│   └── ai_summarizer.py    # Claude Haiku for summaries
-├── utils/
-│   └── logger.py           # Colored console + file logging
-├── data/                   # SQLite DB + logs (auto-created)
-├── requirements.txt
-├── .env.example
-└── README.md
-```
-
----
-
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
-- Python 3.10+
-- A Telegram bot token (from [@BotFather](https://t.me/BotFather))
 
-### 1. Clone & Install
+| Requirement | Details |
+|-------------|---------|
+| **Python** | 3.10+ ([Download](https://www.python.org/downloads/)) |
+| **Telegram Bot Token** | Create via [@BotFather](https://t.me/BotFather) |
+| **Anthropic API Key** | Optional — for AI summaries ([Get key](https://console.anthropic.com)) |
+
+### Installation
 
 ```bash
-git clone <your-repo>
-cd prop-firm-tracker
+# 1. Clone the repository
+git clone https://github.com/SoCloseSociety/PropFirmTrackerBot-.git
+cd PropFirmTrackerBot-
 
-# Create virtual environment
-python3 -m venv venv
-source venv/bin/activate
+# 2. Create a virtual environment
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
 
-# Install dependencies
+# 3. Install dependencies
 pip install -r requirements.txt
-```
 
-### 2. Configure
-
-```bash
+# 4. Configure
 cp .env.example .env
-nano .env   # Fill in your values
-```
+# Edit .env with your credentials
 
-**Minimum required:**
-- `TELEGRAM_BOT_TOKEN` — Get from @BotFather
-- `ADMIN_USER_IDS` — Your Telegram user ID
-
-**Recommended:**
-- `ANTHROPIC_API_KEY` — For AI summaries (~$2-5/mo)
-- `FREE_CHANNEL_ID` / `PREMIUM_CHANNEL_ID` — Your alert channels
-
-### 3. Create Telegram Channels
-
-1. Create **@PropFirmTrackerFree** (public channel)
-2. Create a private premium channel
-3. Add your bot as **admin** to both channels
-4. Get channel IDs (forward a message to [@userinfobot](https://t.me/userinfobot))
-5. Put IDs in `.env`
-
-### 4. Run
-
-```bash
+# 5. Run
 python run.py
 ```
 
-You should see the ASCII banner and startup logs. The bot will:
-1. Initialize the SQLite database
-2. Register Telegram commands
-3. Start the scraper scheduler (first scrape after 30s)
-4. Begin polling for user messages
-
 ---
 
-## 🖥 VPS Deployment
+## How It Works
 
-### Recommended: Hetzner Cloud ($4.51/mo) or Contabo ($5.99/mo)
-
-```bash
-# SSH into your VPS
-ssh root@your-server-ip
-
-# Install Python
-apt update && apt install -y python3 python3-pip python3-venv git
-
-# Clone project
-git clone <your-repo> /opt/prop-firm-tracker
-cd /opt/prop-firm-tracker
-
-# Setup
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-cp .env.example .env
-nano .env  # Configure
-
-# Test run
-python run.py
 ```
-
-### Run as systemd service (auto-restart, auto-start on boot)
-
-```bash
-sudo cat > /etc/systemd/system/propfirmbot.service << 'EOF'
-[Unit]
-Description=PropFirmTracker Bot
-After=network.target
-
-[Service]
-Type=simple
-User=root
-WorkingDirectory=/opt/prop-firm-tracker
-ExecStart=/opt/prop-firm-tracker/venv/bin/python run.py
-Restart=always
-RestartSec=10
-Environment=PYTHONUNBUFFERED=1
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-# Enable and start
-sudo systemctl enable propfirmbot
-sudo systemctl start propfirmbot
-
-# Check status
-sudo systemctl status propfirmbot
-
-# View logs
-sudo journalctl -u propfirmbot -f
+Every 3 hours (configurable)
+         │
+         ▼
+┌─────────────────────────────┐
+│       3 Scrapers (async)    │
+│                             │
+│  1. Firm websites → diffs   │
+│  2. Reddit RSS → mentions   │
+│  3. Trustpilot → scores     │
+└─────────────────────────────┘
+         │
+         ▼
+┌─────────────────────────────┐
+│     AI Summarizer (Claude)  │
+│     Analyzes impact for     │
+│     traders                 │
+└─────────────────────────────┘
+         │
+         ▼
+┌─────────────────────────────┐
+│    Alert Engine             │
+│                             │
+│  Premium → real-time alerts │
+│  Free → 24h delayed alerts  │
+└─────────────────────────────┘
 ```
 
 ---
 
-## ⚙️ Configuration
+## Monitored Firms
 
-### Adding Affiliate Links
-
-In `config.py`, update each firm's `affiliate_url`:
-
-```python
-"ftmo": {
-    ...
-    "affiliate_url": "https://ftmo.com?ref=YOUR_ACTUAL_REF_ID",
-    ...
-}
-```
-
-**How to get affiliate links:**
-1. Go to each firm's website
-2. Look for "Affiliate" or "Partners" in the footer
-3. Sign up for their affiliate program
-4. Replace `YOUR_REF_ID` with your actual referral ID
-
-### Scrape Interval
-
-In `config.py`:
-```python
-SCRAPE_INTERVAL_HOURS = 3   # Scrape every 3 hours (8x/day)
-```
-
-### Alert Delay for Free Channel
-
-```python
-FREE_ALERT_DELAY_HOURS = 24  # Free users get alerts 24h late
-```
-
-### Subscription Pricing
-
-```python
-PREMIUM_PRICE_MONTHLY = 14.99
-PREMIUM_PRICE_YEARLY = 119.99
-```
+| Firm | Pages Tracked |
+|------|---------------|
+| FTMO | Homepage, Pricing, Rules, Blog |
+| Funded Next | Homepage, Pricing, Rules, Blog |
+| The 5%ers | Homepage, Pricing, Rules, Blog |
+| MyFundedFX | Homepage, Pricing, Rules, Blog |
+| TopStep | Homepage, Pricing, Rules, Blog |
+| Apex Trader | Homepage, Pricing, Rules, Blog |
+| E8 Funding | Homepage, Pricing, Rules, Blog |
+| Funding Pips | Homepage, Pricing, Rules, Blog |
+| Goat Funded | Homepage, Pricing, Rules, Blog |
+| Blueberry Funded | Homepage, Pricing, Rules, Blog |
 
 ---
 
-## 🤖 Bot Commands
+## Bot Commands
 
-### Free Commands
-| Command | Description |
-|---------|-------------|
-| `/start` | Welcome + registration |
-| `/help` | All commands |
-| `/firms` | List all monitored firms with Trustpilot scores |
-| `/promos` | Active promo codes |
-| `/scores` | Trustpilot leaderboard |
-| `/compare ftmo fundednext` | Side-by-side comparison |
-| `/referral` | Your referral link + stats |
-| `/premium` | Subscription options |
-| `/status` | Account info |
-
-### Premium Commands
-| Command | Description |
-|---------|-------------|
-| `/history [firm]` | Full change history |
-| `/scams` | Recent scam warnings |
-| `/analysis [firm]` | AI-powered analysis |
-| `/rules [firm]` | Detailed current rules |
-
-### Admin Commands
-| Command | Description |
-|---------|-------------|
-| `/stats` | User + revenue dashboard |
-| `/activate 12345 30` | Give user 30 days premium |
-| `/broadcast Hello!` | Message all users |
-| `/scrape` | Trigger manual scrape |
+| Command | Description | Access |
+|---------|-------------|--------|
+| `/start` | Register and get started | All |
+| `/firms` | List monitored firms with scores | All |
+| `/promos` | Active promo codes | All |
+| `/scores` | Trustpilot leaderboard | All |
+| `/compare [firm1] [firm2]` | Side-by-side comparison | All |
+| `/referral` | Your referral link & stats | All |
+| `/premium` | Subscription options | All |
+| `/history [firm]` | Change history | Premium |
+| `/scams` | Scam warnings | Premium |
+| `/analysis [firm]` | AI analysis | Premium |
+| `/rules [firm]` | Detailed rules | Premium |
+| `/stats` | User & revenue dashboard | Admin |
+| `/broadcast [msg]` | Mass message | Admin |
+| `/scrape` | Trigger manual scrape | Admin |
 
 ---
 
-## ➕ Adding New Firms
+## Configuration
 
-Edit `config.py` and add to `PROP_FIRMS`:
-
-```python
-"new_firm": {
-    "name": "New Firm Name",
-    "url": "https://newfirm.com",
-    "pricing_url": "https://newfirm.com/pricing/",
-    "rules_url": "https://newfirm.com/rules/",
-    "blog_url": "https://newfirm.com/blog/",
-    "trustpilot": "https://www.trustpilot.com/review/newfirm.com",
-    "affiliate_url": "https://newfirm.com?ref=YOUR_REF",
-    "affiliate_commission": "15%",
-},
-```
-
-That's it — the bot will automatically start monitoring the new firm on the next scrape cycle.
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `TELEGRAM_BOT_TOKEN` | Bot token from @BotFather | Yes |
+| `FREE_CHANNEL_ID` | Free alerts channel ID | Yes |
+| `PREMIUM_CHANNEL_ID` | Premium alerts channel ID | Yes |
+| `ADMIN_USER_IDS` | Admin Telegram user IDs | Yes |
+| `ANTHROPIC_API_KEY` | Claude API key for AI summaries | Optional |
+| `STRIPE_API_KEY` | Stripe for payments | Optional |
+| `CRYPTO_WALLET` | USDT TRC20 address | Optional |
 
 ---
 
-## 🚀 Launch Strategy
+## Troubleshooting
 
-### Week 1: Build & Seed
-- [ ] Deploy bot on VPS
-- [ ] Create free Telegram channel
-- [ ] Let it scrape for 2-3 days to build initial data
-- [ ] Post bot link in 10+ trading Telegram groups
+### Bot doesn't start
 
-### Week 2: Grow
-- [ ] Buy 3-5 sponsored posts in trading channels ($50-100 each)
-- [ ] Post on Reddit r/FundedTrading, r/PropFirm
-- [ ] Create a Twitter thread showing the bot's alerts
-- [ ] Target: 500 free users
+1. Check your `.env` — token must be valid
+2. Verify Python 3.10+ with `python --version`
+3. Run `pip install -r requirements.txt`
 
-### Week 3: Convert
-- [ ] Enable premium features
-- [ ] Send a killer free alert (big promo detected) then upsell
-- [ ] Activate referral program
-- [ ] Target: 20-50 premium users
+### Scraper returns no data
 
-### Week 4+: Scale
-- [ ] YouTube Short / TikTok showing the bot
-- [ ] Partner with trading influencers (revenue share)
-- [ ] Add more firms based on user requests
-- [ ] Target: 100+ premium users
+1. Some firms use Cloudflare — the scraper retries automatically
+2. Check `data/bot.log` for error details
+3. Run `/scrape` manually from Telegram to test
+
+### AI summaries not working
+
+1. Verify your `ANTHROPIC_API_KEY` is set
+2. Check API credits at console.anthropic.com
+3. Bot falls back to templates if AI is unavailable
 
 ---
 
-## 💵 Cost Breakdown
+## FAQ
 
-| Item | Monthly Cost |
-|------|-------------|
-| VPS (Hetzner CX22) | $4.51 |
-| Domain (optional) | ~$1 |
-| Claude Haiku API | $2-5 |
-| **Total** | **~$8-12/mo** |
+**Q: Is this free?**
+A: Yes. The bot itself is free and open source. Optional: Claude Haiku costs ~$2-5/month for AI summaries.
 
-**Break-even: 1 premium subscriber covers all costs.**
+**Q: How often does it check firms?**
+A: Every 3 hours by default (configurable in `config.py`).
 
----
+**Q: Can I add more firms?**
+A: Yes — add entries to `FIRMS` dict in `config.py` with their URLs.
 
-## 📝 License
-
-MIT — Use it, fork it, make money with it.
+**Q: What's the VPS cost?**
+A: ~$4-6/month (Hetzner/Contabo). Total operating cost: $8-12/month.
 
 ---
 
-## 🆘 Troubleshooting
+## Alternatives Comparison
 
-**Bot not responding?**
-- Check `TELEGRAM_BOT_TOKEN` in `.env`
-- Ensure no other instance is running: `ps aux | grep run.py`
+| Feature | PropFirm Tracker | Manual Checking | Paid Services |
+|---------|-----------------|-----------------|---------------|
+| Price | **Free** | Free | $30-100/mo |
+| Real-time alerts | Yes | No | Some |
+| AI summaries | Yes (Claude) | No | Rare |
+| Scam detection | Yes (Reddit) | Manual | Some |
+| Trustpilot tracking | Yes | Manual | Some |
+| Open source | Yes | N/A | No |
 
-**Scraper errors?**
-- Some firms may block scrapers — add delays in `config.py`
-- Check `data/bot.log` for detailed errors
+---
 
-**No alerts being sent?**
-- Ensure bot is admin in both channels
-- Check channel IDs are correct (should start with `-100`)
-- Run `/scrape` to trigger manual scrape
+## Contributing
 
-**Database reset?**
-```bash
-rm data/propfirm_tracker.db
-python run.py  # Will recreate
-```
+Contributions are welcome! Please read the [Contributing Guide](CONTRIBUTING.md) before submitting a pull request.
+
+---
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+
+---
+
+## Disclaimer
+
+This tool is provided for **educational and informational purposes only**. It does not constitute financial advice. The authors are not responsible for trading decisions made based on the bot's alerts.
+
+---
+
+<p align="center">
+  <strong>If this project helps you, please give it a star!</strong><br>
+  <a href="https://github.com/SoCloseSociety/PropFirmTrackerBot-">
+    <img src="https://img.shields.io/github/stars/SoCloseSociety/PropFirmTrackerBot-?style=for-the-badge&logo=github&color=575ECF" alt="Star this repo">
+  </a>
+</p>
+
+<br>
+
+<p align="center">
+  <sub>Built with purpose by <a href="https://soclose.co"><strong>SoClose</strong></a> &mdash; Digital Innovation Through Automation & AI</sub><br>
+  <sub>
+    <a href="https://soclose.co">Website</a> &bull;
+    <a href="https://linkedin.com/company/soclose-agency">LinkedIn</a> &bull;
+    <a href="https://twitter.com/SoCloseAgency">Twitter</a> &bull;
+    <a href="mailto:contact@soclose.co">Contact</a>
+  </sub>
+</p>
