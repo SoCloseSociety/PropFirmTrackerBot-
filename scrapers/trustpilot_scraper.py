@@ -1,12 +1,6 @@
-"""
-Trustpilot Scraper V4 — Multi-method: API, Widget, HTML fallback.
-Cloudflare blocks direct HTML, so we try JSON endpoints first.
-"""
-import re, time, random, json, requests
 from utils.logger import log_info, log_error, log_warn
 from database import save_trustpilot_score, get_latest_trustpilot_scores, save_scam_alert
 from config import PROP_FIRMS, REQUEST_TIMEOUT
-
 
 class TrustpilotScraper:
     SCORE_DROP = 0.3
@@ -37,13 +31,13 @@ class TrustpilotScraper:
             }, timeout=REQUEST_TIMEOUT)
             if r.status_code != 200:
                 return None, None
-            text = json.dumps(r.json())
-            sm = re.search(r'"trustScore":\s*([\d.]+)', text)
-            cm = re.search(r'"numberOfReviews":\s*(\d+)', text)
-            if sm:
-                return float(sm.group(1)), int(cm.group(1)) if cm else 0
-        except:
-            pass
+            data = r.json()
+            sm = data.get('data', {}).get('averageScore')
+            cm = data.get('data', {}).get('numberOfReviews')
+            if sm is not None and cm is not None:
+                return float(sm), int(cm)
+        except Exception as e:
+            log_error(f"API error: {e}", tag="SCRAPE")
         return None, None
 
     def _try_widget(self, domain):
@@ -58,10 +52,10 @@ class TrustpilotScraper:
             if bu:
                 sc = bu.get('score') or bu.get('trustScore')
                 ct = bu.get('numberOfReviews') or bu.get('reviewCount')
-                if sc:
-                    return float(sc), int(ct or 0)
-        except:
-            pass
+                if sc is not None and ct is not None:
+                    return float(sc), int(ct)
+        except Exception as e:
+            log_error(f"Widget error: {e}", tag="SCRAPE")
         return None, None
 
     def _try_html(self, domain):
@@ -86,22 +80,22 @@ class TrustpilotScraper:
                         if isinstance(item, dict) and 'aggregateRating' in item:
                             ar = item['aggregateRating']
                             return float(ar.get('ratingValue', 0)), int(ar.get('reviewCount', 0))
-                except:
-                    continue
+                except Exception as e:
+                    log_error(f"JSON-LD error: {e}", tag="SCRAPE")
 
             # __NEXT_DATA__
             m = re.search(r'<script id="__NEXT_DATA__"[^>]*>(.*?)</script>', r.text, re.DOTALL)
             if m:
                 try:
-                    text = json.dumps(json.loads(m.group(1)))
-                    sm = re.search(r'"trustScore":\s*([\d.]+)', text)
-                    cm = re.search(r'"numberOfReviews":\s*(\d+)', text)
-                    if sm:
-                        return float(sm.group(1)), int(cm.group(1)) if cm else 0
-                except:
-                    pass
-        except:
-            pass
+                    data = json.loads(m.group(1))
+                    sm = data.get('props', {}).get('pageProps', {}).get('businessUnitPageData', {}).get('averageScore')
+                    cm = data.get('props', {}).get('pageProps', {}).get('businessUnitPageData', {}).get('numberOfReviews')
+                    if sm is not None and cm is not None:
+                        return float(sm), int(cm)
+                except Exception as e:
+                    log_error(f"__NEXT_DATA__ error: {e}", tag="SCRAPE")
+        except Exception as e:
+            log_error(f"HTML error: {e}", tag="SCRAPE")
         return None, None
 
     def scrape_firm(self, slug, cfg):
