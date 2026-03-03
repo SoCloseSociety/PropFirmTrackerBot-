@@ -87,11 +87,12 @@ class PropFirmScraper:
     def _get_old(self, slug, pt):
         try:
             conn = get_connection()
-            row = conn.execute("SELECT content, content_hash FROM firm_snapshots WHERE firm_slug=? AND page_type=?",
-                (slug, pt)).fetchone()
+            query = "SELECT content, content_hash FROM firm_snapshots WHERE firm_slug=? AND page_type=?"
+            row = conn.execute(query, (slug, pt)).fetchone()
             conn.close()
             return (row['content'], row['content_hash']) if row else (None, None)
-        except:
+        except Exception as e:
+            log_error(f"DB Error: {e}", tag="SCRAPE")
             return None, None
 
     def _diff(self, old, new, name, pt):
