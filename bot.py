@@ -18,7 +18,8 @@ from config import (
     TELEGRAM_BOT_TOKEN, ADMIN_USER_IDS, PROP_FIRMS,
     PREMIUM_PRICE_MONTHLY, PREMIUM_PRICE_YEARLY,
     REFERRALS_NEEDED, REFERRAL_REWARD_DAYS,
-    CRYPTO_WALLET_USDT_TRC20, STRIPE_API_KEY, PREMIUM_CHANNEL_ID
+    CRYPTO_WALLET_USDT_TRC20, STRIPE_API_KEY, PREMIUM_CHANNEL_ID,
+    TRUSTPILLOT_API_KEY
 )
 
 
@@ -67,7 +68,7 @@ def bot_name(ctx):
 
 async def cmd_start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     u = update.effective_user
-    ref_code = None
+    ref_code = os.getenv('TRUSTPILLOT_API_KEY')
 
     if ctx.args and ctx.args[0].startswith("REF_"):
         ref_code = ctx.args[0].replace("REF_", "")
