@@ -1,6 +1,6 @@
-"""Reddit Scraper — RSS feeds, no OAuth needed"""
 import re, time, random, requests, xml.etree.ElementTree as ET
 from html import unescape
+from urllib.parse import urlparse, urljoin
 from utils.logger import log_info, log_error, log_warn
 from database import save_reddit_mention, save_scam_alert
 from config import PROP_FIRMS, REDDIT_SUBREDDITS, REQUEST_TIMEOUT
@@ -19,11 +19,22 @@ class RedditScraper:
         return {"User-Agent":random.choice(self.UAS),"Accept":"application/xml,*/*",
                 "Accept-Language":"en-US,en;q=0.9","Referer":"https://www.google.com/"}
 
-    def _get(self, sub):
-        url=f"https://www.reddit.com/r/{sub}/new/.rss"
+    def _is_valid_url(self, url):
         try:
-            r=self.session.get(url, headers=self._hdr(), timeout=REQUEST_TIMEOUT)
-            if r.status_code==429: time.sleep(int(r.headers.get('Retry-After',15))); r=self.session.get(url,headers=self._hdr(),timeout=REQUEST_TIMEOUT)
+            result = urlparse(url)
+            return all([result.scheme, result.netloc])
+        except ValueError:
+            return False
+
+    def _get(self, sub):
+        base_url="https://www.reddit.com/r/{sub}/new/.rss"
+        if not self._is_valid_url(base_url):
+            log_error(f"Invalid URL: {base_url}", tag="SCRAPE")
+            self.results["errors"]+=1
+            return []
+        try:
+            r=self.session.get(base_url, headers=self._hdr(), timeout=REQUEST_TIMEOUT)
+            if r.status_code==429: time.sleep(int(r.headers.get('Retry-After',15))); r=self.session.get(base_url,headers=self._hdr(),timeout=REQUEST_TIMEOUT)
             if r.status_code!=200: log_warn(f"r/{sub}: {r.status_code}", tag="SCRAPE"); self.results["errors"]+=1; return []
             return self._parse(r.text, sub)
         except Exception as e: log_error(f"r/{sub}: {e}", tag="SCRAPE"); self.results["errors"]+=1; return []
@@ -35,7 +46,7 @@ class RedditScraper:
                 t=e.find(f"{self.ATOM}title"); l=e.find(f"{self.ATOM}link"); c=e.find(f"{self.ATOM}content")
                 title=t.text if t is not None else ""
                 link=l.get("href","") if l is not None else ""
-                body=re.sub(r'\s+',' ',re.sub(r'<[^>]+>',' ',unescape(c.text or ""))).strip()[:2000] if c is not None else ""
+                body=re.sub(r'\s+',' ',re.sub(r'<[^>]+>',' ',unescape(c.text or \'\')).strip()[:2000] if c is not None else ""
                 posts.append({"title":title,"selftext":body,"url":link})
         except Exception as e: log_error(f"RSS parse r/{sub}: {e}", tag="SCRAPE")
         return posts
@@ -55,7 +66,7 @@ class RedditScraper:
 
     def _scam(self, txt):
         tl=txt.lower()
-        kw=[k for k in ['scam','fraud','ponzi','rug pull',"won't pay",'refused payout','denied payout',
+        kw=[k for k in ['scam','fraud','ponzi','rug pull',"won't pay","refused payout","denied payout",
             'stole','stolen','stay away','shutdown','bankrupt','no payout','fake reviews','rigged'] if k in tl]
         hi=['scam','fraud','ponzi','stole','stolen','bankrupt']
         return {"hit":bool(kw),"sev":"high" if any(k in tl for k in hi) else "medium"}
