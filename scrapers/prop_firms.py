@@ -219,7 +219,6 @@ class PropFirmScraper:
                 save_change(slug, pt, "content_update", None, nh, f"Initial scan: {cfg['name']} {pt}")
             if pt in ("pricing", "homepage"):
                 self._promos(soup, text, slug, url)
-            time.sleep(1)
 
     def scrape_all(self):
         log_info(f"Scraping {len(PROP_FIRMS)} firms...", tag="SCRAPE")
@@ -230,6 +229,5 @@ class PropFirmScraper:
             except Exception as e:
                 log_error(f"{s}: {e}", tag="SCRAPE")
                 self.results["errors"] += 1
-            time.sleep(2)
         log_info(f"Scrape complete: {self.results['scraped']}p {self.results['changes']}c {self.results['promos']}pr {self.results['errors']}e", tag="SCRAPE")
         return self.results
